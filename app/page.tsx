@@ -8,7 +8,6 @@ import FilterBar from "@/components/FilterBar";
 import JobCard from "@/components/JobCard";
 import PostJobModal from "@/components/PostJobModal";
 import AlertModal from "@/components/AlertModal";
-import ApplyModal from "@/components/ApplyModal";
 import MyApplicationsModal from "@/components/MyApplicationsModal";
 import Footer from "@/components/Footer";
 import { INITIAL_JOBS } from "@/lib/jobsData";
@@ -30,8 +29,6 @@ export default function Home() {
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isMyAppsModalOpen, setIsMyAppsModalOpen] = useState(false);
-  const [jobForApply, setJobForApply] = useState<Job | null>(null);
-  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch jobs from backend API on mount
@@ -108,11 +105,6 @@ export default function Home() {
     setTimeout(() => {
       setToastMessage(null);
     }, 4500);
-  };
-
-  const handleOpenApplyModal = (job: Job) => {
-    setJobForApply(job);
-    setIsApplyModalOpen(true);
   };
 
   const handleApplicationSubmitted = (jobId: string) => {
@@ -300,13 +292,6 @@ export default function Home() {
       <AlertModal
         isOpen={isAlertModalOpen}
         onClose={() => setIsAlertModalOpen(false)}
-      />
-
-      <ApplyModal
-        job={jobForApply}
-        isOpen={isApplyModalOpen}
-        onClose={() => setIsApplyModalOpen(false)}
-        onApplicationSubmitted={handleApplicationSubmitted}
       />
 
       <MyApplicationsModal
