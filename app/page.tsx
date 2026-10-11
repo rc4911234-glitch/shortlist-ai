@@ -7,6 +7,7 @@ import FilterBar from "@/components/FilterBar";
 import JobCard from "@/components/JobCard";
 import PostJobModal from "@/components/PostJobModal";
 import AlertModal from "@/components/AlertModal";
+import ApplyModal from "@/components/ApplyModal";
 import Footer from "@/components/Footer";
 import { INITIAL_JOBS } from "@/lib/jobsData";
 import { Job, JobCategory } from "@/lib/types";
@@ -19,6 +20,10 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<"latest" | "urgency" | "salary">("latest");
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+
+  // In-App 1-Click Apply state
+  const [jobForApply, setJobForApply] = useState<Job | null>(null);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   // Load any previously posted jobs from localStorage on mount
   useEffect(() => {
@@ -47,10 +52,14 @@ export default function Home() {
     }
   };
 
-  const handleApplyClick = (job: Job) => {
-    // Increment applicant count for that job locally
+  const handleOpenApplyModal = (job: Job) => {
+    setJobForApply(job);
+    setIsApplyModalOpen(true);
+  };
+
+  const handleApplicationSubmitted = (jobId: string) => {
     setJobs(prev => prev.map(j => {
-      if (j.id === job.id && j.applicantsCount < j.maxApplicants) {
+      if (j.id === jobId && j.applicantsCount < j.maxApplicants) {
         return { ...j, applicantsCount: j.applicantsCount + 1 };
       }
       return j;
@@ -126,7 +135,7 @@ export default function Home() {
               <JobCard
                 key={job.id}
                 job={job}
-                onApplyClick={handleApplyClick}
+                onApplyClick={handleOpenApplyModal}
               />
             ))}
           </div>
@@ -196,6 +205,14 @@ export default function Home() {
       <AlertModal
         isOpen={isAlertModalOpen}
         onClose={() => setIsAlertModalOpen(false)}
+      />
+
+      {/* 1-Click In-App Direct Application Modal */}
+      <ApplyModal
+        job={jobForApply}
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        onApplicationSubmitted={handleApplicationSubmitted}
       />
     </main>
   );

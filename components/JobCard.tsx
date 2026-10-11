@@ -14,7 +14,8 @@ import {
   Mail, 
   Flame,
   Sparkles,
-  Zap
+  Zap,
+  Send
 } from "lucide-react";
 import { Job } from "@/lib/types";
 
@@ -112,7 +113,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           </div>
         </div>
 
-        {/* Right: 50-Spot Urgency Meter & CTAs */}
+        {/* Right: 50-Spot Urgency Meter & In-App CTAs */}
         <div className="w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
           
           {/* Progress bar */}
@@ -146,16 +147,14 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
 
-            <a
-              href={job.applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* In-App Direct 1-Click Apply */}
+            <button
               onClick={() => onApplyClick(job)}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-slate-900 hover:bg-rose-600 text-white font-bold text-xs shadow-sm transition-all hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
             >
-              <span>Apply</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+              <Send className="w-3.5 h-3.5" />
+              <span>1-Click Apply</span>
+            </button>
           </div>
         </div>
       </div>
@@ -198,25 +197,39 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
             </div>
           )}
 
-          {/* Hiring manager contact & Direct Apply Bar */}
+          {/* Hiring manager contact & Direct In-App Apply Bar */}
           <div className="p-4 rounded-xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs text-slate-600">
-              <Mail className="w-4 h-4 text-rose-500" />
-              <span>
-                Direct hiring lead: <b>{job.contactEmail || `careers@${job.company.toLowerCase().replace(/[^a-z]/g, '')}.com`}</b>
-              </span>
+            <div>
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <Mail className="w-4 h-4 text-rose-500" />
+                <span>
+                  Direct hiring lead: <b>{job.contactEmail || `careers@${job.company.toLowerCase().replace(/[^a-z]/g, '')}.com`}</b>
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-400 mt-0.5">
+                Apply directly through ZeroSpamJobs to be reviewed in 48 hours.
+              </div>
             </div>
 
-            <a
-              href={job.applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => onApplyClick(job)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all"
-            >
-              <span>Submit Direct Application ({spotsLeft} spots remaining)</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <a
+                href={job.applyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-slate-500 hover:text-slate-900 underline flex items-center gap-1"
+              >
+                <span>External Link</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+
+              <button
+                onClick={() => onApplyClick(job)}
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Submit 1-Click Application ({spotsLeft} spots left)</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
