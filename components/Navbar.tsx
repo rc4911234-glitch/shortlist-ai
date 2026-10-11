@@ -44,15 +44,6 @@ export default function Navbar({ onOpenAlerts }: NavbarProps) {
 
         {/* Right CTAs */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Build ATS Resume */}
-          <Link
-            href="/resume-builder"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-            <span className="hidden sm:inline">Build ATS Resume</span>
-          </Link>
-
           {/* Job Alerts */}
           <button
             onClick={onOpenAlerts}

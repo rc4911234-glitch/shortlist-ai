@@ -74,14 +74,6 @@ export default function Hero({ onOpenAlerts, onOpenPostJob }: HeroProps) {
 
         {/* Quick candidate and founder action banner */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <Link
-            href="/resume-builder"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all hover:scale-105"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-            <span>Build ATS Resume (Pass 99% Screeners)</span>
-          </Link>
-
           <button
             onClick={onOpenAlerts}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all"
