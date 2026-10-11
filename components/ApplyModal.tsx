@@ -72,6 +72,25 @@ export default function ApplyModal({
         email,
       });
       localStorage.setItem("my_submitted_applications", JSON.stringify(list));
+
+      // Post to backend API
+      fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: generatedId,
+          jobId: job.id,
+          jobTitle: job.title,
+          company: job.company,
+          fullName,
+          email,
+          phone,
+          linkedin,
+          experience,
+          pitch,
+          resumeText
+        })
+      }).catch(console.error);
     } catch (err) {
       console.error(err);
     }

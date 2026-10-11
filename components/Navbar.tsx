@@ -44,6 +44,13 @@ export default function Navbar({ onOpenPostJob, onOpenAlerts }: NavbarProps) {
 
         {/* Right CTAs */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          <a
+            href="/admin"
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          >
+            <span>Founder Panel</span>
+          </a>
+
           <button
             onClick={onOpenAlerts}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"

@@ -87,6 +87,13 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
       contactEmail: contactEmail || `careers@${company.toLowerCase().replace(/[^a-z]/g, '')}.com`
     };
 
+    // Post to backend API
+    fetch("/api/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newJob)
+    }).catch(console.error);
+
     confetti({
       particleCount: 120,
       spread: 80,
