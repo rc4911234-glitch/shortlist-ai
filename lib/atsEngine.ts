@@ -22,6 +22,7 @@ export interface ATSAnalysisResult {
     improved: string;
     reason: string;
   }[];
+  tailoredResumeText: string;
 }
 
 const COMMON_SKILLS = [
@@ -155,7 +156,7 @@ export function analyzeResume(resumeText: string, jobDescriptionText: string): A
   if (impactScore < 20 && wordCount > 100) impactScore = 35;
 
   // 4. Overall Weighted Score
-  // Weights: Keywords 40%, Formatting 30%, Impact 30%
+  // Weights: Keywords 45%, Formatting 25%, Impact 30%
   const overallScore = Math.min(98, Math.max(25, Math.round(
     (keywordMatchRate * 0.45) +
     (formattingScore * 0.25) +
@@ -196,6 +197,26 @@ export function analyzeResume(resumeText: string, jobDescriptionText: string): A
     }
   ];
 
+  // 6. Generate 1-Click Tailored ATS Resume
+  let tailoredResume = resumeText;
+  bulletSuggestions.forEach(b => {
+    if (tailoredResume.includes(b.original)) {
+      tailoredResume = tailoredResume.replace(b.original, b.improved);
+    }
+  });
+
+  if (missingKeywords.length > 0) {
+    const formattedMissing = missingKeywords.map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(", ");
+    if (tailoredResume.includes("TECHNICAL SKILLS") || tailoredResume.includes("SKILLS")) {
+      tailoredResume = tailoredResume.replace(
+        /(TECHNICAL SKILLS|SKILLS)/i,
+        `$1\nTarget Job Competencies (ATS Matched): ${formattedMissing}`
+      );
+    } else {
+      tailoredResume += `\n\nCORE COMPETENCIES (ATS Matched):\n${formattedMissing}`;
+    }
+  }
+
   return {
     overallScore,
     grade,
@@ -209,6 +230,7 @@ export function analyzeResume(resumeText: string, jobDescriptionText: string): A
     impactScore,
     quantifiedMetricsCount,
     actionVerbsCount: foundActionVerbs,
-    bulletSuggestions
+    bulletSuggestions,
+    tailoredResumeText: tailoredResume
   };
 }
