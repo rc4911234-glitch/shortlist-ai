@@ -60,10 +60,10 @@ export default function ResumeBuilderPage() {
   const [docTitle, setDocTitle] = useState("ROHIT_CHAUDHARY_Resume");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
-  // Left Sidebar Mode: "design" (Templates & Colors) vs "formatting" (Content & Inputs)
+  // Left Sidebar Mode: "design" (Templates) vs "formatting" (Content & Inputs)
   const [leftTab, setLeftTab] = useState<"design" | "formatting">("design");
 
-  // Candidate Info (Matching User Screenshot)
+  // Candidate Info (Matching User's Real Details from Screenshot)
   const [fullName, setFullName] = useState("ROHIT CHAUDHARY");
   const [jobTitle, setJobTitle] = useState("Full Stack Software Engineer");
   const [email, setEmail] = useState("rohitchaudhary5755@gmail.com");
@@ -158,76 +158,79 @@ export default function ResumeBuilderPage() {
   // Education
   const [education, setEducation] = useState("HSC • 12th Science, Bihar School Examination Board (BSEB), Madhubani • July 2023");
 
-  // Template Engine
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("silicon-blue");
-  const [activeAccent, setActiveAccent] = useState<string>("#2563eb"); // Ocean Blue from screenshot
-  const [activeFont, setActiveFont] = useState<FontStyle>("sans");
-  const [activeDensity, setActiveDensity] = useState<SpacingDensity>("normal");
-
-  // Filter & Search in Sidebar
-  const [sidebarFilter, setSidebarFilter] = useState<string>("All");
-  const [sidebarSearch, setSidebarSearch] = useState<string>("");
+  // Template State
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("silicon-01");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [templateSearch, setTemplateSearch] = useState<string>("");
 
   // Modals
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [activeSectionScroll, setActiveSectionScroll] = useState<string>("heading");
 
-  // 10 Color Swatches from ResumeNow screenshot
-  const STUDIO_COLORS = [
-    { name: "White/Silver", hex: "#f8fafc", dotBg: "#f8fafc", border: "border-slate-400" },
-    { name: "Charcoal", hex: "#0f172a", dotBg: "#0f172a", border: "border-slate-900" },
-    { name: "Warm Tan", hex: "#b45309", dotBg: "#b45309", border: "border-amber-700" },
-    { name: "Ocean Blue", hex: "#2563eb", dotBg: "#2563eb", border: "border-blue-600" }, // Selected in screenshot!
-    { name: "Cyan Teal", hex: "#06b6d4", dotBg: "#06b6d4", border: "border-cyan-500" },
-    { name: "Emerald Green", hex: "#059669", dotBg: "#059669", border: "border-emerald-600" },
-    { name: "Sunset Orange", hex: "#ea580c", dotBg: "#ea580c", border: "border-orange-600" },
-    { name: "Ruby Rose", hex: "#e11d48", dotBg: "#e11d48", border: "border-rose-600" },
-    { name: "Velvet Purple", hex: "#7c3aed", dotBg: "#7c3aed", border: "border-purple-600" },
+  // 8 Core Distinct Layouts Gallery
+  const CORE_LAYOUTS: { id: string; name: string; blueprint: LayoutBlueprint; tag: string; description: string }[] = [
+    {
+      id: "silicon-01",
+      name: "Silicon Modern",
+      blueprint: "silicon",
+      tag: "Startups & Tech",
+      description: "Left-aligned modern tech layout with blue role pill badges, left border section bars, and tech chips."
+    },
+    {
+      id: "harvard-01",
+      name: "Harvard Classic",
+      blueprint: "harvard",
+      tag: "Ivy League Serif",
+      description: "Traditional Georgia serif, centered uppercase header, solid divider lines, Fortune 500 standard."
+    },
+    {
+      id: "executive-01",
+      name: "Executive Slate",
+      blueprint: "executive",
+      tag: "Staff / Leadership",
+      description: "Full dark slate banner across the top, authoritative double lines, bold corporate hierarchy."
+    },
+    {
+      id: "compact-01",
+      name: "Compact 1-Page",
+      blueprint: "compact",
+      tag: "High Density Fit",
+      description: "Ultra-dense single page format, compact line height, space-saving inline header."
+    },
+    {
+      id: "metro-01",
+      name: "Corporate Metro",
+      blueprint: "metro",
+      tag: "Modern Boxed",
+      description: "Candidate card box header, solid dark block badges for section titles, crisp business structure."
+    },
+    {
+      id: "editorial-01",
+      name: "Editorial Elegance",
+      blueprint: "editorial",
+      tag: "Book & Finance",
+      description: "Classic Garamond book font, centered diamond dividers (◆), refined publishing style."
+    },
+    {
+      id: "technical-01",
+      name: "Systems Terminal",
+      blueprint: "technical",
+      tag: "DevOps & Code",
+      description: "Terminal code syntax with // 01. SECTION tags, monospace tech badges, developer prompt."
+    },
+    {
+      id: "minimal-01",
+      name: "Nordic Minimal",
+      blueprint: "minimal",
+      tag: "Clean Whitespace",
+      description: "Airy whitespace, light sans font, hairline dividers, elegant small-caps accents."
+    }
   ];
 
-  const currentTemplate: ResumeTemplate = 
-    RESUME_TEMPLATES_100.find((t) => t.id === selectedTemplateId) || RESUME_TEMPLATES_100[0];
+  const currentLayout = CORE_LAYOUTS.find((l) => l.id === selectedTemplateId) || CORE_LAYOUTS[0];
 
-  const handleSelectTemplate = (tmpl: ResumeTemplate) => {
-    setSelectedTemplateId(tmpl.id);
-    setActiveAccent(tmpl.accentHex);
-    setActiveFont(tmpl.font);
-    setActiveDensity(tmpl.density);
-  };
-
-  const filteredTemplates = RESUME_TEMPLATES_100.filter((t) => {
-    const matchesCat = sidebarFilter === "All" || t.category === sidebarFilter;
-    const matchesSearch = 
-      t.name.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
-      t.roleTag.toLowerCase().includes(sidebarSearch.toLowerCase());
-    return matchesCat && matchesSearch;
-  });
-
-  const getFontFamily = (font: FontStyle) => {
-    switch (font) {
-      case "serif":
-        return "'Georgia', 'Times New Roman', serif";
-      case "editorial":
-        return "'Garamond', 'Baskerville', serif";
-      case "mono":
-        return "'Courier New', monospace";
-      case "sans":
-      default:
-        return "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-    }
-  };
-
-  const getDensityPadding = (density: SpacingDensity) => {
-    switch (density) {
-      case "compact":
-        return "p-6 sm:p-7";
-      case "spacious":
-        return "p-9 sm:p-12";
-      case "normal":
-      default:
-        return "p-8 sm:p-10";
-    }
+  const handleSelectLayout = (layoutId: string) => {
+    setSelectedTemplateId(layoutId);
   };
 
   // ATS Score Calculator
@@ -289,19 +292,10 @@ export default function ResumeBuilderPage() {
     }));
   };
 
-  const handleAddBulletToExp = (expId: string) => {
-    setExperiences(experiences.map((exp) => {
-      if (exp.id === expId) {
-        return { ...exp, bullets: [...exp.bullets, "Delivered scalable feature that improved performance by 25%."] };
-      }
-      return exp;
-    }));
-  };
-
   return (
     <div className="min-h-screen bg-[#182236] text-slate-100 selection:bg-blue-600 selection:text-white flex flex-col font-sans">
       
-      {/* Non-Printable Header Bar */}
+      {/* Header Bar */}
       <header className="border-b border-slate-800 bg-[#111927] sticky top-0 z-40 print:hidden shadow-md">
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -339,7 +333,6 @@ export default function ResumeBuilderPage() {
             </div>
           </div>
 
-          {/* Right Header Badges */}
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -358,13 +351,13 @@ export default function ResumeBuilderPage() {
         </div>
       </header>
 
-      {/* 3-COLUMN STUDIO LAYOUT (Matching Screenshot) */}
+      {/* 3-COLUMN STUDIO LAYOUT */}
       <div className="flex-1 max-w-[1700px] w-full mx-auto px-2 sm:px-4 py-4 flex flex-col lg:flex-row gap-5 items-start justify-center">
         
-        {/* COLUMN 1: LEFT SIDEBAR (Design & Formatting Panel) */}
+        {/* COLUMN 1: LEFT SIDEBAR (Templates Selector Panel) */}
         <aside className="w-full lg:w-[320px] shrink-0 bg-[#1f2b42] rounded-2xl border border-slate-700/80 shadow-xl overflow-hidden flex flex-col print:hidden max-h-[calc(100vh-80px)] sticky top-16">
           
-          {/* Top Tabs: Design vs Formatting */}
+          {/* Top Tabs: Templates vs Content Form */}
           <div className="grid grid-cols-2 p-2 gap-1.5 bg-[#172133] border-b border-slate-800">
             <button
               onClick={() => setLeftTab("design")}
@@ -374,8 +367,8 @@ export default function ResumeBuilderPage() {
                   : "text-slate-400 hover:text-white hover:bg-slate-800/40"
               }`}
             >
-              <Palette className="w-3.5 h-3.5 text-blue-400" />
-              <span>Design</span>
+              <Layout className="w-3.5 h-3.5 text-blue-400" />
+              <span>Templates</span>
             </button>
 
             <button
@@ -387,160 +380,142 @@ export default function ResumeBuilderPage() {
               }`}
             >
               <Sliders className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Formatting</span>
+              <span>Edit Content</span>
             </button>
           </div>
 
-          {/* TAB 1: DESIGN (Colors & Miniature Templates Grid - Exact Match to Screenshot) */}
+          {/* TAB 1: TEMPLATES GRID (Clicking any card visibly transforms the center resume) */}
           {leftTab === "design" && (
-            <div className="p-4 overflow-y-auto flex-1 space-y-5 scrollbar-thin scrollbar-thumb-slate-700">
+            <div className="p-4 overflow-y-auto flex-1 space-y-4 scrollbar-thin scrollbar-thumb-slate-700">
               
-              {/* Colors Section */}
-              <div>
-                <label className="text-xs font-extrabold text-slate-300 block mb-2.5">
-                  Colors
-                </label>
-                <div className="grid grid-cols-5 gap-2.5">
-                  {STUDIO_COLORS.map((col) => {
-                    const isSelected = activeAccent.toLowerCase() === col.hex.toLowerCase();
-                    return (
-                      <button
-                        key={col.name}
-                        onClick={() => setActiveAccent(col.hex)}
-                        title={col.name}
-                        className={`w-9 h-9 rounded-full transition-all flex items-center justify-center relative shadow-sm border-2 ${
-                          isSelected 
-                            ? "ring-2 ring-white scale-110 border-white" 
-                            : `${col.border} hover:scale-105 opacity-80 hover:opacity-100`
-                        }`}
-                        style={{ backgroundColor: col.dotBg }}
-                      >
-                        {isSelected && (
-                          <Check className={`w-4 h-4 stroke-[3] ${col.hex === "#f8fafc" ? "text-slate-900" : "text-white"}`} />
-                        )}
-                      </button>
-                    );
-                  })}
+              <div className="flex items-center justify-between pb-1">
+                <div>
+                  <span className="text-xs font-extrabold text-white block">Select Template Style</span>
+                  <span className="text-[10px] text-slate-400">Click to instantly change layout</span>
                 </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold">
+                  Active: {currentLayout.name}
+                </span>
               </div>
 
-              {/* Templates Section Header */}
-              <div className="border-t border-slate-700/60 pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-extrabold text-slate-300">
-                    Templates
-                  </label>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    {filteredTemplates.length} Available
-                  </span>
-                </div>
+              {/* 2-COLUMN GRID OF MINI PAPER RESUME THUMBNAILS */}
+              <div className="grid grid-cols-2 gap-3">
+                {CORE_LAYOUTS.map((tmpl) => {
+                  const isSelected = selectedTemplateId === tmpl.id;
+                  return (
+                    <button
+                      key={tmpl.id}
+                      type="button"
+                      onClick={() => handleSelectLayout(tmpl.id)}
+                      className={`relative w-full h-44 rounded-lg bg-white border text-left p-2.5 overflow-hidden flex flex-col justify-between transition-all group ${
+                        isSelected
+                          ? "border-blue-500 ring-2 ring-blue-500 shadow-xl scale-[1.02]"
+                          : "border-slate-400/80 hover:border-slate-200 opacity-90 hover:opacity-100 hover:scale-[1.01]"
+                      }`}
+                    >
+                      {/* Checkmark Badge on Selected Thumbnail */}
+                      {isSelected && (
+                        <div className="absolute top-1.5 right-1.5 z-10 w-4 h-4 rounded-full bg-slate-950 text-white flex items-center justify-center text-[10px] font-black shadow-md">
+                          ✓
+                        </div>
+                      )}
 
-                {/* Search / Filter Input */}
-                <div className="relative mb-3">
-                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Search templates..."
-                    value={sidebarSearch}
-                    onChange={(e) => setSidebarSearch(e.target.value)}
-                    className="w-full pl-8 pr-2.5 py-1.5 rounded-xl bg-[#172133] border border-slate-700 text-[11px] text-white placeholder-slate-500 outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                {/* 2-COLUMN GRID OF MINI PAPER RESUME THUMBNAILS (Exact match to Screenshot) */}
-                <div className="grid grid-cols-2 gap-3">
-                  {filteredTemplates.slice(0, 30).map((tmpl) => {
-                    const isSelected = selectedTemplateId === tmpl.id;
-                    return (
-                      <button
-                        key={tmpl.id}
-                        type="button"
-                        onClick={() => handleSelectTemplate(tmpl)}
-                        className={`relative w-full h-44 rounded-lg bg-white border text-left p-2 overflow-hidden flex flex-col justify-between transition-all group ${
-                          isSelected
-                            ? "border-blue-500 ring-2 ring-blue-500 shadow-lg scale-[1.02]"
-                            : "border-slate-600/70 hover:border-slate-300 opacity-90 hover:opacity-100 hover:scale-[1.01]"
-                        }`}
-                      >
-                        {/* Checkmark Badge on Selected Thumbnail */}
-                        {isSelected && (
-                          <div className="absolute top-1.5 right-1.5 z-10 w-4 h-4 rounded-full bg-slate-950 text-white flex items-center justify-center text-[10px] font-black shadow-md">
-                            ✓
+                      {/* Top Header Representation */}
+                      <div>
+                        {tmpl.blueprint === "harvard" ? (
+                          <div className="text-center mb-1.5">
+                            <div className="h-1.5 w-16 bg-slate-900 rounded mx-auto mb-0.5" />
+                            <div className="h-0.5 w-12 bg-slate-400 rounded mx-auto mb-1" />
+                            <div className="h-[1px] w-full bg-slate-900" />
+                          </div>
+                        ) : tmpl.blueprint === "editorial" ? (
+                          <div className="text-center mb-1.5">
+                            <div className="h-1.5 w-14 bg-slate-900 rounded mx-auto mb-0.5" />
+                            <div className="text-[6px] text-slate-500">◆ ◆ ◆</div>
+                            <div className="h-[1px] w-full bg-slate-400" />
+                          </div>
+                        ) : tmpl.blueprint === "executive" ? (
+                          <div className="mb-1.5">
+                            <div className="h-2 w-full rounded -mt-2.5 -mx-2.5 mb-1 bg-slate-900" />
+                            <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
+                            <div className="h-[1px] w-full bg-slate-900" />
+                          </div>
+                        ) : tmpl.blueprint === "metro" ? (
+                          <div className="p-1 rounded mb-1.5 bg-slate-100 border border-slate-300">
+                            <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
+                            <div className="h-0.5 w-16 bg-slate-500 rounded" />
+                          </div>
+                        ) : tmpl.blueprint === "technical" ? (
+                          <div className="mb-1.5">
+                            <div className="text-[6px] font-mono text-emerald-600">&gt; dev /</div>
+                            <div className="h-1.5 w-14 bg-slate-900 font-mono rounded mb-1" />
+                            <div className="h-[1px] w-full bg-slate-900" />
+                          </div>
+                        ) : tmpl.blueprint === "compact" ? (
+                          <div className="mb-1 pb-1 border-b border-slate-300">
+                            <div className="h-1.5 w-16 bg-slate-900 rounded mb-0.5" />
+                            <div className="h-0.5 w-full bg-slate-400 rounded" />
+                          </div>
+                        ) : tmpl.blueprint === "minimal" ? (
+                          <div className="mb-1.5 pb-1 border-b border-slate-100">
+                            <div className="h-1 w-14 bg-slate-700 rounded mb-0.5" />
+                            <div className="h-0.5 w-10 bg-slate-300 rounded" />
+                          </div>
+                        ) : (
+                          // Silicon Modern
+                          <div className="mb-1.5">
+                            <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
+                            <div className="h-1 w-10 rounded mb-1 bg-blue-600" />
+                            <div className="h-[1px] w-full bg-slate-200" />
                           </div>
                         )}
 
-                        {/* Top Simulated Header */}
-                        <div>
-                          {tmpl.blueprint === "harvard" || tmpl.blueprint === "editorial" ? (
-                            <div className="text-center mb-1.5">
-                              <div className="h-1.5 w-16 bg-slate-900 rounded mx-auto mb-0.5" />
-                              <div className="h-0.5 w-12 bg-slate-400 rounded mx-auto mb-1" />
-                              <div className="h-[1px] w-full bg-slate-800" />
-                            </div>
-                          ) : tmpl.blueprint === "executive" ? (
-                            <div className="mb-1.5">
-                              <div className="h-1.5 w-full rounded -mt-2 -mx-2 mb-1" style={{ backgroundColor: activeAccent }} />
-                              <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
-                              <div className="h-[1px] w-full" style={{ backgroundColor: activeAccent }} />
-                            </div>
-                          ) : tmpl.blueprint === "metro" ? (
-                            <div className="p-1 rounded mb-1.5" style={{ backgroundColor: `${activeAccent}18` }}>
-                              <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
-                              <div className="h-0.5 w-20 bg-slate-500 rounded" />
-                            </div>
-                          ) : (
-                            <div className="mb-1.5">
-                              <div className="h-1.5 w-14 bg-slate-900 rounded mb-0.5" />
-                              <div className="h-1 w-8 rounded mb-1" style={{ backgroundColor: activeAccent }} />
-                              <div className="h-[1px] w-full bg-slate-200" />
-                            </div>
-                          )}
+                        {/* Skeleton lines representing body structure */}
+                        <div className="space-y-1">
+                          <div className="h-1 w-8 bg-slate-800 rounded" />
+                          <div className="h-0.5 w-full bg-slate-300 rounded" />
+                          <div className="h-0.5 w-4/5 bg-slate-300 rounded" />
 
-                          {/* Simulated Skeleton Lines */}
-                          <div className="space-y-1">
-                            {/* Summary lines */}
-                            <div className="h-1 w-8 bg-slate-700 rounded" />
+                          <div className="pt-1">
+                            <div className={`h-1 w-10 rounded mb-0.5 ${
+                              tmpl.blueprint === "silicon" ? "bg-blue-600" :
+                              tmpl.blueprint === "technical" ? "bg-emerald-600" : "bg-slate-900"
+                            }`} />
                             <div className="h-0.5 w-full bg-slate-300 rounded" />
-                            <div className="h-0.5 w-5/6 bg-slate-300 rounded" />
-
-                            {/* Section line */}
-                            <div className="pt-1">
-                              <div 
-                                className="h-1 w-10 rounded mb-0.5"
-                                style={{ 
-                                  backgroundColor: tmpl.blueprint === "silicon" ? activeAccent : "#0f172a" 
-                                }} 
-                              />
-                              <div className="h-0.5 w-full bg-slate-300 rounded" />
-                              <div className="h-0.5 w-4/5 bg-slate-300 rounded" />
-                              <div className="h-0.5 w-3/4 bg-slate-300 rounded" />
-                            </div>
+                            <div className="h-0.5 w-3/4 bg-slate-300 rounded" />
                           </div>
                         </div>
+                      </div>
 
-                        {/* Thumbnail Footer Label */}
-                        <div className="pt-1 border-t border-slate-100 flex items-center justify-between">
-                          <span className="text-[9px] font-bold text-slate-800 truncate max-w-[90px] group-hover:text-blue-600">
-                            {tmpl.name}
-                          </span>
-                          <span className="text-[7.5px] font-mono font-semibold px-1 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
-                            {tmpl.blueprint}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                      {/* Thumbnail Footer Label */}
+                      <div className="pt-1 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[9.5px] font-bold text-slate-900 truncate max-w-[85px] group-hover:text-blue-600">
+                          {tmpl.name}
+                        </span>
+                        <span className="text-[7.5px] font-mono font-bold px-1 py-0.5 rounded bg-slate-100 text-slate-700 uppercase">
+                          {tmpl.tag.split(" ")[0]}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Template Description Card */}
+              <div className="p-3 rounded-xl bg-[#172133] border border-slate-700/80 text-xs">
+                <span className="font-bold text-white block mb-0.5">{currentLayout.name}</span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  {currentLayout.description}
+                </p>
               </div>
 
             </div>
           )}
 
-          {/* TAB 2: FORMATTING & CONTENT (Input Fields & Editor) */}
+          {/* TAB 2: EDIT CONTENT (Form inputs) */}
           {leftTab === "formatting" && (
             <div className="p-4 overflow-y-auto flex-1 space-y-4 text-xs scrollbar-thin scrollbar-thumb-slate-700">
               
-              {/* Personal Details */}
               <div className="space-y-2 bg-[#172133] p-3.5 rounded-xl border border-slate-700">
                 <span className="font-bold text-white text-xs block mb-1">Personal Heading</span>
                 <div>
@@ -682,7 +657,7 @@ export default function ResumeBuilderPage() {
 
               {/* Websites */}
               <div className="space-y-1.5 bg-[#172133] p-3.5 rounded-xl border border-slate-700">
-                <span className="font-bold text-white text-xs block">Websites, Portfolios, Profiles</span>
+                <span className="font-bold text-white text-xs block">Websites, Portfolios</span>
                 <textarea
                   rows={2}
                   value={websites}
@@ -696,7 +671,7 @@ export default function ResumeBuilderPage() {
 
         </aside>
 
-        {/* COLUMN 2: CENTER LIVE A4 RESUME CANVAS (Floating Sheet with Real-time Updates) */}
+        {/* COLUMN 2: CENTER LIVE A4 RESUME CANVAS (VISIBLY MORPHS ACCORDING TO TEMPLATE) */}
         <main className="flex-1 flex flex-col items-center justify-start w-full max-w-[850px]">
           
           {/* Document Top Bar */}
@@ -704,174 +679,729 @@ export default function ResumeBuilderPage() {
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-200">{docTitle}</span>
               <span className="text-slate-500">•</span>
-              <span className="text-[11px]">Template: <strong className="text-white">{currentTemplate.name}</strong></span>
+              <span className="text-[11px]">Template: <strong className="text-white">{currentLayout.name}</strong></span>
             </div>
             <div className="text-[11px] text-slate-400 font-mono">
-              A4 Format (100% ATS Ready)
+              A4 Format (Single-Column ATS Verified)
             </div>
           </div>
 
-          {/* THE ACTUAL WHITE A4 RESUME SHEET */}
-          <div 
-            id="resume-document"
-            className={`bg-white rounded-lg shadow-2xl border border-slate-300 w-full ${getDensityPadding(activeDensity)} text-slate-900 selection:bg-blue-100 ${
-              currentTemplate.blueprint === "executive" ? "border-t-8" : ""
-            }`}
-            style={{ 
-              minHeight: "1120px", 
-              fontFamily: getFontFamily(activeFont),
-              borderTopColor: currentTemplate.blueprint === "executive" ? activeAccent : undefined
-            }}
-          >
-            
-            {/* CANDIDATE HEADER */}
-            <div className="pb-3 border-b border-slate-200 space-y-1">
-              <h1 
-                className="text-2xl sm:text-3xl font-black tracking-tight uppercase"
-                style={{ color: activeAccent }}
-              >
-                {fullName}
-              </h1>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-600 font-sans">
-                <span>{phone}</span>
-                <span>|</span>
-                <span className="font-medium text-slate-800">{email}</span>
-                <span>|</span>
-                <span>{location}</span>
-              </div>
-            </div>
+          {/* ========================================================= */}
+          {/* THE 8 DISTINCT TEMPLATE BLUEPRINTS                        */}
+          {/* ========================================================= */}
 
-            {/* SUMMARY SECTION */}
-            {summary && (
-              <div className="pt-3.5 space-y-1">
-                <h2 
-                  className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                  style={{ color: activeAccent }}
-                >
-                  SUMMARY
-                </h2>
-                <p className="text-[11px] text-slate-700 leading-relaxed text-justify">
-                  {summary}
-                </p>
-              </div>
-            )}
-
-            {/* SKILLS SECTION */}
-            {skills && (
-              <div className="pt-3.5 space-y-1.5">
-                <h2 
-                  className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                  style={{ color: activeAccent }}
-                >
-                  SKILLS
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700">
-                  {skills.split(",").map((sk, idx) => (
-                    <div key={idx} className="flex items-start gap-1.5">
-                      <span className="text-slate-400 leading-none">•</span>
-                      <span>{sk.trim()}</span>
+          {/* BLUEPRINT 1: SILICON MODERN (Tech Startup, Blue Pill, Left Bars, Skill Chips) */}
+          {currentLayout.blueprint === "silicon" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-10 text-slate-900 font-sans leading-relaxed text-xs selection:bg-blue-100"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Header */}
+              <div className="pb-3 border-b-2 border-slate-200 space-y-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <h1 className="text-3xl font-black text-slate-950 tracking-tight">{fullName}</h1>
+                    <div className="inline-block px-3 py-0.5 rounded-full text-xs font-bold mt-1 bg-blue-50 text-blue-700 border border-blue-200">
+                      {jobTitle}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* EXPERIENCE SECTION */}
-            <div className="pt-3.5 space-y-2">
-              <h2 
-                className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                style={{ color: activeAccent }}
-              >
-                EXPERIENCE
-              </h2>
-
-              <div className="space-y-3 pt-0.5">
-                {experiences.map((exp) => (
-                  <div key={exp.id} className="space-y-0.5">
-                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between font-sans">
-                      <div>
-                        <span className="font-black text-slate-900 text-xs">{exp.role}</span>
-                        <span className="text-slate-600 font-medium text-xs">, {exp.company}</span>
-                      </div>
-                      <span className="text-[10.5px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
-                    </div>
-
-                    {exp.location && (
-                      <div className="text-[10.5px] text-slate-500 italic pb-0.5">
-                        {exp.location}
-                      </div>
-                    )}
-
-                    <ul className="list-disc list-outside pl-4 space-y-0.5 text-[10.5px] text-slate-700 leading-relaxed">
-                      {exp.bullets.map((b, i) => (
-                        <li key={i}>{b}</li>
-                      ))}
-                    </ul>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className="text-right text-[11px] text-slate-500 font-medium">{location}</div>
+                </div>
 
-            {/* EDUCATION SECTION */}
-            {education && (
-              <div className="pt-3.5 space-y-1">
-                <h2 
-                  className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                  style={{ color: activeAccent }}
-                >
-                  EDUCATION
-                </h2>
-                <div className="text-[11px] text-slate-800 font-sans">
-                  {education}
+                <div className="flex flex-wrap items-center gap-x-3 text-[11px] text-slate-600 pt-1 font-sans">
+                  <span>{phone}</span>
+                  <span>•</span>
+                  <span className="text-blue-600 font-bold">{email}</span>
+                  <span>•</span>
+                  <span>{linkedin}</span>
+                  <span>•</span>
+                  <span>{github}</span>
                 </div>
               </div>
-            )}
 
-            {/* PROJECTS SECTION */}
-            {projects.length > 0 && (
-              <div className="pt-3.5 space-y-1.5">
-                <h2 
-                  className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                  style={{ color: activeAccent }}
-                >
-                  PROJECTS
+              {/* Summary */}
+              {summary && (
+                <div className="pt-3.5 space-y-1">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                    Summary
+                  </h2>
+                  <p className="text-[11px] text-slate-700 leading-relaxed pl-3.5 text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills as Interactive Modern Chips */}
+              {skills && (
+                <div className="pt-3.5 space-y-1.5">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                    Skills & Core Proficiencies
+                  </h2>
+                  <div className="flex flex-wrap gap-1.5 pl-3.5 pt-1">
+                    {skills.split(",").map((sk, idx) => (
+                      <span key={idx} className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[10.5px] font-semibold border border-slate-200">
+                        {sk.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3.5 space-y-2">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                  Experience
                 </h2>
 
-                <div className="space-y-1.5 pt-0.5 text-[11px] text-slate-700">
-                  {projects.map((proj) => (
-                    <div key={proj.id} className="space-y-0.5">
-                      <div>
-                        <strong className="text-slate-900 font-bold">{proj.title}</strong>
-                        {proj.tech && <span className="text-slate-500 text-[10.5px]"> ({proj.tech})</span>}
-                        {proj.bullets.length > 0 && <span>, {proj.bullets[0]}</span>}
+                <div className="space-y-3 pl-3.5 pt-0.5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-0.5">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between font-sans">
+                        <div>
+                          <span className="font-black text-slate-950 text-xs">{exp.role}</span>
+                          <span className="text-blue-600 font-bold text-xs"> — {exp.company}</span>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono font-bold shrink-0">{exp.duration}</span>
                       </div>
+                      {exp.location && <div className="text-[10px] text-slate-400 italic">{exp.location}</div>}
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[10.5px] text-slate-700 leading-relaxed">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* WEBSITES, PORTFOLIOS, PROFILES */}
-            {websites && (
-              <div className="pt-3.5 space-y-1">
-                <h2 
-                  className="text-xs font-black uppercase tracking-wider pb-0.5 font-sans"
-                  style={{ color: activeAccent }}
-                >
-                  WEBSITES, PORTFOLIOS, PROFILES
+              {/* Education */}
+              {education && (
+                <div className="pt-3.5 space-y-1">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                    Education
+                  </h2>
+                  <div className="text-[11px] text-slate-800 pl-3.5 font-medium">{education}</div>
+                </div>
+              )}
+
+              {/* Projects */}
+              {projects.length > 0 && (
+                <div className="pt-3.5 space-y-1.5">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                    Projects
+                  </h2>
+                  <div className="space-y-1.5 pl-3.5 pt-0.5 text-[11px] text-slate-700">
+                    {projects.map((proj) => (
+                      <div key={proj.id} className="space-y-0.5">
+                        <strong className="text-slate-900">{proj.title}</strong>
+                        {proj.tech && <span className="text-slate-500 text-[10.5px]"> ({proj.tech})</span>}
+                        {proj.bullets.length > 0 && <span> — {proj.bullets[0]}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Websites */}
+              {websites && (
+                <div className="pt-3.5 space-y-1">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5 py-0.5">
+                    Websites, Portfolios
+                  </h2>
+                  <div className="space-y-0.5 text-[10.5px] text-slate-700 pl-3.5">
+                    {websites.split("\n").filter(Boolean).map((url, i) => (
+                      <div key={i}>• <span className="text-blue-600 font-mono hover:underline">{url.trim()}</span></div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 2: HARVARD CLASSIC (Ivy League Georgia Serif, Centered Header, Dividing Rules) */}
+          {currentLayout.blueprint === "harvard" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-12 text-slate-900 font-serif leading-relaxed text-xs selection:bg-rose-100"
+              style={{ minHeight: "1120px", fontFamily: "'Georgia', 'Times New Roman', serif" }}
+            >
+              {/* Centered Academic Header */}
+              <div className="text-center pb-3 border-b-2 border-slate-900 space-y-1">
+                <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-widest text-slate-950" style={{ letterSpacing: "2px" }}>
+                  {fullName}
+                </h1>
+                <div className="text-xs font-semibold uppercase tracking-widest text-slate-700 font-sans">
+                  {jobTitle}
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-600 font-sans pt-1">
+                  <span>{phone}</span>
+                  <span>•</span>
+                  <span>{email}</span>
+                  <span>•</span>
+                  <span>{location}</span>
+                  <span>•</span>
+                  <span>{linkedin}</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-4 space-y-1">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-800 pb-0.5">
+                    PROFESSIONAL SUMMARY
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800 leading-relaxed pt-1 text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-4 space-y-1">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-800 pb-0.5">
+                    TECHNICAL PROFICIENCIES
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800 pt-1 leading-relaxed">
+                    <b>Core Technologies:</b> {skills}
+                  </p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-4 space-y-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-800 pb-0.5">
+                  WORK EXPERIENCE
                 </h2>
-                <div className="space-y-0.5 text-[10.5px] text-slate-700">
-                  {websites.split("\n").filter(Boolean).map((url, i) => (
-                    <div key={i} className="flex items-center gap-1.5">
-                      <span className="text-slate-400">•</span>
-                      <span className="text-blue-600 font-mono hover:underline">{url.trim()}</span>
+
+                <div className="space-y-3.5 pt-1">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-1">
+                      <div className="flex items-baseline justify-between font-sans">
+                        <div>
+                          <span className="font-bold text-slate-950 text-xs">{exp.role}</span>
+                          <span className="text-slate-700 italic font-serif"> — {exp.company}</span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-1 text-[11px] text-slate-800 leading-relaxed font-serif">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
 
-          </div>
+              {/* Education */}
+              {education && (
+                <div className="pt-4 space-y-1">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-800 pb-0.5">
+                    EDUCATION
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800 pt-1 font-sans">{education}</p>
+                </div>
+              )}
+
+              {/* Projects */}
+              {projects.length > 0 && (
+                <div className="pt-4 space-y-2">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-800 pb-0.5">
+                    PROJECTS & OPEN SOURCE
+                  </h2>
+                  <div className="space-y-2 pt-1 font-sans">
+                    {projects.map((proj) => (
+                      <div key={proj.id} className="space-y-0.5">
+                        <span className="font-bold text-slate-950 text-xs">{proj.title}</span>
+                        <span className="text-slate-500 text-[11px]"> ({proj.tech})</span>
+                        {proj.bullets.length > 0 && <p className="text-[11px] text-slate-800 font-serif">• {proj.bullets[0]}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 3: EXECUTIVE SLATE (Dark Banner Top Header, Double Slate Lines, Staff Authority) */}
+          {currentLayout.blueprint === "executive" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-10 text-slate-900 font-sans leading-relaxed text-xs"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Full Width Dark Header Banner */}
+              <div className="bg-slate-900 text-white p-6 -mx-8 sm:-mx-10 -mt-8 sm:-mt-10 mb-5 rounded-t-lg space-y-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                  <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">{fullName}</h1>
+                  <div className="text-xs font-bold tracking-widest text-slate-300 uppercase">{jobTitle}</div>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-3 text-[11px] text-slate-300 pt-1 font-medium">
+                  <span>{phone}</span>
+                  <span>|</span>
+                  <span className="font-bold text-white">{email}</span>
+                  <span>|</span>
+                  <span>{location}</span>
+                  <span>|</span>
+                  <span>{linkedin}</span>
+                </div>
+              </div>
+
+              {/* Executive Summary */}
+              {summary && (
+                <div className="pt-2 space-y-1">
+                  <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">EXECUTIVE SUMMARY</h2>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Leadership</span>
+                  </div>
+                  <p className="text-[11.5px] text-slate-800 leading-relaxed pt-1 text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-3.5 space-y-1">
+                  <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">CORE COMPETENCIES</h2>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Architecture</span>
+                  </div>
+                  <p className="text-[11.5px] text-slate-800 pt-1 leading-relaxed">
+                    <strong className="text-slate-950 font-bold">Domain Expertise:</strong> {skills}
+                  </p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3.5 space-y-2">
+                <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">PROFESSIONAL TRACK RECORD</h2>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Chronological</span>
+                </div>
+
+                <div className="space-y-3.5 pt-1">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <div>
+                          <span className="font-black text-slate-950 text-xs uppercase">{exp.company}</span>
+                          <span className="text-slate-700 font-semibold italic text-xs ml-2">— {exp.role}</span>
+                        </div>
+                        <span className="text-[11px] font-mono font-bold text-slate-600">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-800 leading-relaxed">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              {education && (
+                <div className="pt-3.5 space-y-1">
+                  <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">EDUCATION & CREDENTIALS</h2>
+                  </div>
+                  <p className="text-[11.5px] text-slate-800 pt-1">{education}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 4: COMPACT 1-PAGE (High Density, Space Saving, Tight Inline Header) */}
+          {currentLayout.blueprint === "compact" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-6 sm:p-7 text-slate-900 font-sans leading-snug text-[10px]"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Inline Compact Header */}
+              <div className="border-b border-slate-300 pb-2 mb-2 flex items-baseline justify-between">
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">{fullName}</h1>
+                  <div className="text-xs font-bold text-blue-600">{jobTitle}</div>
+                </div>
+                <div className="text-right text-[10px] text-slate-600 font-sans space-y-0.5">
+                  <div>{phone} | {email}</div>
+                  <div>{location} | {linkedin}</div>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-1.5 space-y-0.5">
+                  <h2 className="text-[10.5px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">SUMMARY</h2>
+                  <p className="text-[10px] text-slate-800 leading-tight pt-0.5">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-2 space-y-0.5">
+                  <h2 className="text-[10.5px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">SKILLS</h2>
+                  <p className="text-[10px] text-slate-800 pt-0.5"><strong>Proficiencies:</strong> {skills}</p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-2 space-y-1.5">
+                <h2 className="text-[10.5px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">EXPERIENCE</h2>
+                <div className="space-y-2 pt-0.5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-0.5">
+                      <div className="flex items-baseline justify-between font-sans">
+                        <div>
+                          <span className="font-bold text-slate-950">{exp.role}</span>
+                          <span className="text-slate-600"> — {exp.company}</span>
+                        </div>
+                        <span className="text-[9.5px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-3.5 space-y-0.5 text-[9.5px] text-slate-800 leading-tight">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              {education && (
+                <div className="pt-2 space-y-0.5">
+                  <h2 className="text-[10.5px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">EDUCATION</h2>
+                  <p className="text-[10px] text-slate-800 pt-0.5">{education}</p>
+                </div>
+              )}
+
+              {/* Projects */}
+              {projects.length > 0 && (
+                <div className="pt-2 space-y-1">
+                  <h2 className="text-[10.5px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">PROJECTS</h2>
+                  <div className="space-y-1 pt-0.5">
+                    {projects.map((proj) => (
+                      <div key={proj.id} className="space-y-0.5">
+                        <strong className="text-slate-950">{proj.title}</strong>
+                        <span className="text-slate-500"> ({proj.tech})</span>
+                        {proj.bullets.length > 0 && <span className="text-slate-700"> — {proj.bullets[0]}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 5: CORPORATE METRO (Boxed Card Header, Black Badge Titles) */}
+          {currentLayout.blueprint === "metro" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-10 text-slate-900 font-sans leading-relaxed text-xs"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Boxed Card Header */}
+              <div className="bg-slate-100 border border-slate-300 p-4 rounded-xl mb-4 space-y-1">
+                <div className="flex items-baseline justify-between">
+                  <h1 className="text-2xl font-black text-slate-900">{fullName}</h1>
+                  <span className="text-xs font-bold text-slate-600">{jobTitle}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-3 text-[11px] text-slate-600 pt-1 font-sans">
+                  <span>{phone}</span>
+                  <span>•</span>
+                  <span>{email}</span>
+                  <span>•</span>
+                  <span>{location}</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-2 space-y-1">
+                  <div className="inline-block bg-slate-900 text-white px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider mb-1">
+                    01 // SUMMARY
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-3 space-y-1">
+                  <div className="inline-block bg-slate-900 text-white px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider mb-1">
+                    02 // CORE PROFICIENCIES
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed">{skills}</p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3 space-y-2">
+                <div className="inline-block bg-slate-900 text-white px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider mb-1">
+                  03 // WORK EXPERIENCE
+                </div>
+                <div className="space-y-3 pt-0.5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-1">
+                      <div className="flex items-baseline justify-between font-sans">
+                        <span className="font-black text-slate-900 text-xs">{exp.role} — {exp.company}</span>
+                        <span className="text-[10px] font-mono text-slate-600">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[10.5px] text-slate-700 leading-relaxed">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              {education && (
+                <div className="pt-3 space-y-1">
+                  <div className="inline-block bg-slate-900 text-white px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider mb-1">
+                    04 // EDUCATION
+                  </div>
+                  <p className="text-[11px] text-slate-800">{education}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 6: EDITORIAL ELEGANCE (Garamond Book, Diamond Dividers, Refined Layout) */}
+          {currentLayout.blueprint === "editorial" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-12 text-slate-900 font-serif leading-relaxed text-xs"
+              style={{ minHeight: "1120px", fontFamily: "'Garamond', 'Baskerville', serif" }}
+            >
+              {/* Centered Editorial Header */}
+              <div className="text-center pb-3 border-b border-slate-800 space-y-1 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-normal text-slate-950 uppercase" style={{ letterSpacing: "3px" }}>
+                  {fullName}
+                </h1>
+                <div className="text-xs italic text-slate-600">{jobTitle}</div>
+                <div className="flex items-center justify-center gap-2 text-[11px] text-slate-600 pt-1 font-sans">
+                  <span>{phone}</span>
+                  <span>◆</span>
+                  <span>{email}</span>
+                  <span>◆</span>
+                  <span>{location}</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-2 space-y-1 text-center">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+                    — ◆ PROFESSIONAL SUMMARY ◆ —
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800 leading-relaxed text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-3.5 space-y-1 text-center">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+                    — ◆ AREAS OF EXPERTISE ◆ —
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800 leading-relaxed">{skills}</p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3.5 space-y-2">
+                <h2 className="text-center text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-0.5 mb-2">
+                  — ◆ EXPERIENCE ◆ —
+                </h2>
+                <div className="space-y-3 pt-0.5 text-left">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-0.5">
+                      <div className="flex items-baseline justify-between">
+                        <span className="font-bold text-slate-950 text-xs">{exp.role}, <span className="italic font-normal">{exp.company}</span></span>
+                        <span className="text-[10.5px] text-slate-500 font-mono">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-800 leading-relaxed">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              {education && (
+                <div className="pt-3.5 space-y-1 text-center">
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+                    — ◆ EDUCATION ◆ —
+                  </h2>
+                  <p className="text-[11.5px] text-slate-800">{education}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 7: TECHNICAL SYSTEMS (DevOps & Systems, Monospace Chips, // 01. CODE TAGS) */}
+          {currentLayout.blueprint === "technical" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-10 text-slate-900 font-sans leading-relaxed text-xs"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Terminal Code Header */}
+              <div className="pb-3 border-b-2 border-slate-900 space-y-1 mb-4">
+                <div className="font-mono text-[10px] text-emerald-600 font-bold">&gt; developer / terminal_profile</div>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight font-mono">{fullName}</h1>
+                <div className="font-mono text-xs font-bold text-slate-700">{jobTitle}</div>
+                <div className="flex flex-wrap items-center gap-2 text-[10.5px] font-mono text-slate-600 pt-1">
+                  <span>[tel: {phone}]</span>
+                  <span>[mail: {email}]</span>
+                  <span>[loc: {location}]</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-2 space-y-1">
+                  <div className="font-mono text-xs font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block mb-1">
+                    // 01. PROFILE_SUMMARY
+                  </div>
+                  <p className="text-[11px] text-slate-800 leading-relaxed">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills as Syntax Badges */}
+              {skills && (
+                <div className="pt-3 space-y-1.5">
+                  <div className="font-mono text-xs font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block mb-1">
+                    // 02. TECH_STACK
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {skills.split(",").map((sk, idx) => (
+                      <span key={idx} className="font-mono text-[10px] px-2 py-0.5 bg-slate-900 text-emerald-400 rounded">
+                        [{sk.trim()}]
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3 space-y-2">
+                <div className="font-mono text-xs font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block mb-1">
+                  // 03. EXPERIENCE_LOG
+                </div>
+                <div className="space-y-3 pt-0.5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-0.5">
+                      <div className="flex items-baseline justify-between font-mono">
+                        <span className="font-bold text-slate-950 text-xs">{exp.role} @ {exp.company}</span>
+                        <span className="text-[10px] text-slate-500">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[10.5px] text-slate-700 leading-relaxed font-sans">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Projects */}
+              {projects.length > 0 && (
+                <div className="pt-3 space-y-1.5">
+                  <div className="font-mono text-xs font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block mb-1">
+                    // 04. REPOSITORIES & SYSTEMS
+                  </div>
+                  <div className="space-y-1.5 pt-0.5 text-[11px] text-slate-700">
+                    {projects.map((proj) => (
+                      <div key={proj.id} className="space-y-0.5">
+                        <strong className="text-slate-950 font-mono">{proj.title}</strong>
+                        <span className="text-emerald-700 font-mono text-[10px]"> ({proj.tech})</span>
+                        {proj.bullets.length > 0 && <span> — {proj.bullets[0]}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Education */}
+              {education && (
+                <div className="pt-3 space-y-1">
+                  <div className="font-mono text-xs font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block mb-1">
+                    // 05. CREDENTIALS
+                  </div>
+                  <p className="text-[11px] text-slate-800 font-mono">{education}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BLUEPRINT 8: NORDIC MINIMAL (Airy Whitespace, Light Sans Typography, Hairline Dividers) */}
+          {currentLayout.blueprint === "minimal" && (
+            <div 
+              id="resume-document"
+              className="bg-white rounded-lg shadow-2xl border border-slate-300 w-full p-8 sm:p-12 text-slate-900 font-sans leading-relaxed text-xs"
+              style={{ minHeight: "1120px" }}
+            >
+              {/* Airy Minimalist Header */}
+              <div className="pb-4 border-b border-slate-100 space-y-1 mb-4">
+                <h1 className="text-3xl font-light text-slate-800 tracking-wide">{fullName}</h1>
+                <div className="text-xs font-medium text-slate-400 tracking-wider uppercase">{jobTitle}</div>
+                <div className="flex flex-wrap items-center gap-x-4 text-[11px] text-slate-400 pt-1 font-sans">
+                  <span>{phone}</span>
+                  <span>/</span>
+                  <span>{email}</span>
+                  <span>/</span>
+                  <span>{location}</span>
+                </div>
+              </div>
+
+              {/* Summary */}
+              {summary && (
+                <div className="pt-2 space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-1 mb-1.5 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>Profile</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed text-justify">{summary}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {skills && (
+                <div className="pt-3 space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-1 mb-1.5 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>Skills</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">{skills}</p>
+                </div>
+              )}
+
+              {/* Experience */}
+              <div className="pt-3 space-y-2">
+                <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-1 mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span>Experience</span>
+                </div>
+                <div className="space-y-3 pt-0.5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="space-y-0.5">
+                      <div className="flex items-baseline justify-between">
+                        <span className="font-bold text-slate-800 text-xs">{exp.role} <span className="font-normal text-slate-400">at {exp.company}</span></span>
+                        <span className="text-[10.5px] text-slate-400">{exp.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside pl-4 space-y-0.5 text-[10.5px] text-slate-600 leading-relaxed">
+                        {exp.bullets.map((b, i) => <li key={i}>{b}</li>)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              {education && (
+                <div className="pt-3 space-y-1">
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-1 mb-1.5 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>Education</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600">{education}</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Footer Legal links */}
           <footer className="mt-8 mb-4 text-center text-[11px] text-slate-500 space-x-3 print:hidden">
@@ -884,10 +1414,10 @@ export default function ResumeBuilderPage() {
 
         </main>
 
-        {/* COLUMN 3: RIGHT SIDEBAR (Actions & Resume Section Navigator - Matching Screenshot) */}
+        {/* COLUMN 3: RIGHT SIDEBAR (Actions & Sections Navigator) */}
         <aside className="w-full lg:w-[240px] shrink-0 space-y-4 print:hidden sticky top-16">
           
-          {/* Action Button Row: Download, Print, Email */}
+          {/* Action Button Row */}
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={handlePrintDownload}
@@ -929,12 +1459,12 @@ export default function ResumeBuilderPage() {
           <div className="p-3 rounded-xl bg-[#1f2b42] border border-slate-700 flex items-center gap-2 text-xs text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <div className="leading-tight">
-              <span className="font-bold text-white block">ATS Score Verified</span>
-              <span className="text-[10px] text-slate-400">98% pass rate on Greenhouse</span>
+              <span className="font-bold text-white block">ATS Score: 98/100</span>
+              <span className="text-[10px] text-slate-400">Greenhouse / Lever Verified</span>
             </div>
           </div>
 
-          {/* Resume Sections Navigation List (Exact match to Screenshot) */}
+          {/* Resume Sections Navigation List */}
           <div className="bg-[#1f2b42] rounded-2xl border border-slate-700 p-4 space-y-3">
             <h3 className="font-extrabold text-white text-xs tracking-wide">
               Resume Sections
@@ -992,7 +1522,7 @@ export default function ResumeBuilderPage() {
                 Download ATS-Pro PDF
               </h3>
               <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-                Unlock all templates with lifetime access, unlimited edits, and instant clean browser PDF export.
+                Unlock all template layouts with lifetime access, unlimited edits, and instant clean browser PDF export.
               </p>
             </div>
 
@@ -1000,7 +1530,7 @@ export default function ResumeBuilderPage() {
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-left">
               <div>
                 <span className="font-bold text-slate-900 block text-sm">Lifetime Pro PDF Access</span>
-                <span className="text-xs text-slate-500">All templates + unlimited edits & downloads</span>
+                <span className="text-xs text-slate-500">All layouts + unlimited edits & downloads</span>
               </div>
               <div className="text-right">
                 <span className="text-2xl font-black text-blue-600">₹99</span>
@@ -1016,7 +1546,7 @@ export default function ResumeBuilderPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Live color customization & unlimited template switches</span>
+                <span>Unlimited template switches (Harvard, Silicon, Executive, etc.)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -1043,7 +1573,7 @@ export default function ResumeBuilderPage() {
         </div>
       )}
 
-      {/* Print Stylesheet (Hides all studio chrome, prints pristine paper document) */}
+      {/* Print Stylesheet */}
       <style jsx global>{`
         @media print {
           body {
