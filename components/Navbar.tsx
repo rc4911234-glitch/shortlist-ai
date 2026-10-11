@@ -98,7 +98,7 @@ export default function Navbar({
             className="inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-600/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Post a Job (₹1,999)</span>
+            <span>Post a Job (Free Launch)</span>
           </button>
         </div>
       </div>

@@ -160,6 +160,29 @@ export default function ApplyModal({
               </div>
             </div>
 
+            <div className="flex flex-col gap-2 my-4">
+              {job.contactEmail && (
+                <a
+                  href={`mailto:${job.contactEmail}?subject=Application for ${encodeURIComponent(job.title)} [${appId}]&body=Hi ${encodeURIComponent(job.company)} Hiring Team,%0D%0A%0D%0AI have just submitted my direct application for ${encodeURIComponent(job.title)} (Spot Ref: ${appId}) on ZeroSpamJobs.%0D%0A%0D%0AName: ${encodeURIComponent(fullName)}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0AExperience: ${encodeURIComponent(experience)}%0D%0A%0D%0AThank you!`}
+                  className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Email Hiring Lead Directly ({job.contactEmail})</span>
+                </a>
+              )}
+              {job.applyUrl && (
+                <a
+                  href={job.applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Also View Official Careers Page</span>
+                </a>
+              )}
+            </div>
+
             <button
               onClick={handleReset}
               className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all"

@@ -244,7 +244,7 @@ export default function Home() {
               Stop Paying ₹15,000 on Naukri for 2,000 Garbage Resumes.
             </h3>
             <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl">
-              Post on ZeroSpamJobs for ₹1,999 ($79). Get capped at 50 high-signal applicants, and review every single candidate with dignity.
+              Post on ZeroSpamJobs for 100% FREE during our Launch Special. Get capped at 50 high-signal applicants, and review every single candidate with dignity.
             </p>
           </div>
 
@@ -253,7 +253,7 @@ export default function Home() {
             className="shrink-0 px-6 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Post a Job for ₹1,999</span>
+            <span>Post a Job for Free</span>
           </button>
         </div>
 

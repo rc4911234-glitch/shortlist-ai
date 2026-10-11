@@ -13,7 +13,8 @@ import {
   DollarSign, 
   MapPin, 
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  Plus
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Job } from "@/lib/types";
@@ -310,23 +311,24 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
                 </div>
               </div>
 
-              {/* Total Price & Checkout */}
-              <div className="p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between">
+              {/* Free Launch Special Checkout */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <div className="text-[11px] text-slate-400">Total Investment</div>
-                  <div className="text-2xl font-black text-rose-400">
-                    ₹{totalINR.toLocaleString("en-IN")}
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">
+                    <span>🎉 100% Free Launch Promotion</span>
+                  </div>
+                  <div className="text-sm font-bold text-slate-200 mt-1">
+                    Free for First 20 Verified Startups <span className="text-xs text-slate-400 line-through">(Normally ₹1,999)</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="submit"
-                    className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
-                  >
-                    <span>Pay ₹{totalINR.toLocaleString("en-IN")} & Publish Live</span>
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4 stroke-[3]" />
+                  <span>Publish Job for Free</span>
+                </button>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-[10px] text-slate-400">
