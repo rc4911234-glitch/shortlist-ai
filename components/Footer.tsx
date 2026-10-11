@@ -1,5 +1,6 @@
 import React from "react";
-import { Flame, Heart } from "lucide-react";
+import Link from "next/link";
+import { Flame } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -28,11 +29,12 @@ export default function Footer() {
             © {new Date().getFullYear()} ZeroSpamJobs. Built like Pieter Levels (RemoteOK) • Fast, lean, solo.
           </div>
 
-          <div className="flex items-center gap-6 text-slate-400">
-            <a href="#" className="hover:text-white transition-colors">Manifesto</a>
-            <a href="#" className="hover:text-white transition-colors">Pricing for Startups</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="mailto:contact@zerospamjobs.com" className="hover:text-white transition-colors">Contact</a>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-slate-400">
+            <Link href="/about" className="hover:text-white transition-colors">Manifesto</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/refunds" className="hover:text-white transition-colors">Refunds</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
           </div>
         </div>
       </div>
