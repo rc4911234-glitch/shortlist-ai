@@ -175,6 +175,44 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col bg-slate-50 selection:bg-rose-600 selection:text-white">
+      {/* Google Jobs Schema.org Structured Data (RemoteOK Organic Traffic Secret) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jobs.map(job => ({
+              "@context": "https://schema.org/",
+              "@type": "JobPosting",
+              "title": job.title,
+              "description": job.description,
+              "datePosted": "2026-10-11",
+              "validThrough": "2026-11-30",
+              "employmentType": "FULL_TIME",
+              "hiringOrganization": {
+                "@type": "Organization",
+                "name": job.company,
+                "sameAs": job.companyWebsite || `https://${job.company.toLowerCase().replace(/[^a-z]/g, "")}.com`,
+                "logo": job.companyLogo
+              },
+              "jobLocationType": "TELECOMMUTE",
+              "applicantLocationRequirements": {
+                "@type": "Country",
+                "name": "Worldwide"
+              },
+              "baseSalary": {
+                "@type": "MonetaryAmount",
+                "currency": job.currency,
+                "value": {
+                  "@type": "QuantitativeValue",
+                  "value": job.salary,
+                  "unitText": "YEAR"
+                }
+              }
+            }))
+          )
+        }}
+      />
+
       <Navbar
         onOpenPostJob={() => setIsPostJobModalOpen(true)}
         onOpenAlerts={() => setIsAlertModalOpen(true)}
