@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ShortlistAI - Free ATS Resume Checker & 1-Click Optimizer",
-  description: "Check your resume against ATS systems (Workday, Greenhouse, Taleo) and boost your score to 90%+ in 30 seconds.",
+  title: "ZeroSpamJobs - Curated Remote & Startup Jobs (Capped at 50 Applicants)",
+  description: "Stop applying to 2,000-person black holes. Every job on ZeroSpamJobs is capped at 50 applicants with 100% transparent salaries and direct founder links.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased selection:bg-blue-500 selection:text-white">
+      <body className="antialiased selection:bg-rose-500 selection:text-white">
         {children}
       </body>
     </html>
