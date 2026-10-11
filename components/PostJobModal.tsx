@@ -311,14 +311,14 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
                 </div>
               </div>
 
-              {/* Free Launch Special Checkout */}
+              {/* Professional Paid Checkout */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">
-                    <span>🎉 100% Free Launch Promotion</span>
+                  <div className="text-[11px] font-semibold text-slate-300">
+                    Total Investment (30-Day Listing)
                   </div>
-                  <div className="text-sm font-bold text-slate-200 mt-1">
-                    Free for First 20 Verified Startups <span className="text-xs text-slate-400 line-through">(Standard: $199 / ₹14,999)</span>
+                  <div className="text-xl font-black text-rose-400 mt-0.5">
+                    $199 USD <span className="text-xs text-slate-400 font-normal">(₹14,999 INR)</span>
                   </div>
                 </div>
 
@@ -327,7 +327,7 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
                   className="w-full sm:w-auto px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5"
                 >
                   <Plus className="w-4 h-4 stroke-[3]" />
-                  <span>Publish Job for Free</span>
+                  <span>Pay $199 & Publish Job Live</span>
                 </button>
               </div>
 

@@ -476,17 +476,17 @@ export default function PostJobPage() {
               <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">
-                      <span>🎉 100% Free Launch Promotion</span>
+                    <div className="text-xs font-semibold text-slate-300">
+                      Standard 30-Day Listing + Selected Boosts
                     </div>
-                    <div className="text-base font-bold text-slate-200 mt-1">
-                      Free for First 20 Verified Startups <span className="text-xs text-slate-400 line-through">(${totalUSD} USD)</span>
+                    <div className="text-base font-bold text-white mt-0.5">
+                      Total Investment: ${totalUSD} USD <span className="text-xs text-slate-400 font-normal">(₹{(totalUSD * 83).toLocaleString("en-IN")} INR)</span>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-2xl font-black text-emerald-400">$0 USD</div>
-                    <div className="text-[10px] text-slate-400">Launch Special Today</div>
+                    <div className="text-2xl font-black text-rose-400">${totalUSD} USD</div>
+                    <div className="text-[10px] text-slate-400">30 Days Active Distribution</div>
                   </div>
                 </div>
 
@@ -496,7 +496,7 @@ export default function PostJobPage() {
                   className="w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-lg shadow-rose-600/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4 stroke-[3]" />
-                  <span>{isSubmitting ? "Publishing Role..." : "Publish Job Live for Free"}</span>
+                  <span>{isSubmitting ? "Processing Listing..." : `Pay $${totalUSD} & Publish Job Live`}</span>
                 </button>
               </div>
 

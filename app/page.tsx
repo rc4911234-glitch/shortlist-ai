@@ -8,7 +8,6 @@ import FilterBar from "@/components/FilterBar";
 import JobCard from "@/components/JobCard";
 import PostJobModal from "@/components/PostJobModal";
 import AlertModal from "@/components/AlertModal";
-import MyApplicationsModal from "@/components/MyApplicationsModal";
 import Footer from "@/components/Footer";
 import { INITIAL_JOBS } from "@/lib/jobsData";
 import { Job, JobCategory, ExperienceFilter, CurrencyFilter } from "@/lib/types";
@@ -23,12 +22,9 @@ export default function Home() {
   const [currencyFilter, setCurrencyFilter] = useState<CurrencyFilter>("All");
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
-  const [appliedCount, setAppliedCount] = useState(0);
-
   // Modals state
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [isMyAppsModalOpen, setIsMyAppsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch jobs from backend API on mount
@@ -46,16 +42,10 @@ export default function Home() {
     }
     loadJobs();
 
-    // Load saved jobs and applied count from localStorage
+    // Load saved jobs from localStorage
     try {
       const storedSaved = localStorage.getItem("saved_jobs_list");
       if (storedSaved) setSavedJobIds(JSON.parse(storedSaved));
-
-      const storedApps = localStorage.getItem("my_submitted_applications");
-      if (storedApps) {
-        const parsed = JSON.parse(storedApps);
-        if (Array.isArray(parsed)) setAppliedCount(parsed.length);
-      }
     } catch (e) {
       console.error(e);
     }
@@ -108,7 +98,6 @@ export default function Home() {
   };
 
   const handleApplicationSubmitted = (jobId: string) => {
-    setAppliedCount(prev => prev + 1);
     setJobs(prev => prev.map(j => {
       if (j.id === jobId && j.applicantsCount < j.maxApplicants) {
         const newCount = j.applicantsCount + 1;
@@ -214,10 +203,7 @@ export default function Home() {
       />
 
       <Navbar
-        onOpenPostJob={() => setIsPostJobModalOpen(true)}
         onOpenAlerts={() => setIsAlertModalOpen(true)}
-        onOpenMyApplications={() => setIsMyAppsModalOpen(true)}
-        appliedCount={appliedCount}
       />
 
       <Hero
@@ -313,7 +299,7 @@ export default function Home() {
             className="shrink-0 px-6 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Post a Job for Free</span>
+            <span>Post a Job ($199)</span>
           </Link>
         </div>
 
@@ -330,11 +316,6 @@ export default function Home() {
       <AlertModal
         isOpen={isAlertModalOpen}
         onClose={() => setIsAlertModalOpen(false)}
-      />
-
-      <MyApplicationsModal
-        isOpen={isMyAppsModalOpen}
-        onClose={() => setIsMyAppsModalOpen(false)}
       />
 
       {/* Floating Action Toast (RemoteOK Style Clean Feedback) */}
