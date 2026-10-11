@@ -31,6 +31,7 @@ export default function Home() {
   const [isMyAppsModalOpen, setIsMyAppsModalOpen] = useState(false);
   const [jobForApply, setJobForApply] = useState<Job | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch jobs from backend API on mount
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function Home() {
   const handleToggleSaveJob = (jobId: string) => {
     setSavedJobIds(prev => {
       const updated = prev.includes(jobId) 
-        ? prev.filter(id => id !== jobId) 
+        ? prev.filter(id => id !== jobId)
         : [...prev, jobId];
       try {
         localStorage.setItem("saved_jobs_list", JSON.stringify(updated));
@@ -78,6 +79,34 @@ export default function Home() {
 
   const handleJobPublished = (newJob: Job) => {
     setJobs(prev => [newJob, ...prev]);
+  };
+
+  const handleApplyClick = (job: Job) => {
+    handleApplicationSubmitted(job.id);
+
+    try {
+      const stored = localStorage.getItem("my_submitted_applications");
+      const list = stored ? JSON.parse(stored) : [];
+      if (!list.some((item: { jobId: string }) => item.jobId === job.id)) {
+        list.unshift({
+          id: `DIR-${Math.floor(10000 + Math.random() * 90000)}`,
+          jobId: job.id,
+          jobTitle: job.title,
+          company: job.company,
+          appliedAt: "Just now",
+          fullName: "Direct Candidate",
+          email: "Applied directly on Official Careers Portal"
+        });
+        localStorage.setItem("my_submitted_applications", JSON.stringify(list));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    setToastMessage(`🚀 Opening official career portal for ${job.company}! Spot tracked.`);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
   };
 
   const handleOpenApplyModal = (job: Job) => {
@@ -191,7 +220,7 @@ export default function Home() {
               <JobCard
                 key={job.id}
                 job={job}
-                onApplyClick={handleOpenApplyModal}
+                onApplyClick={handleApplyClick}
                 isSaved={savedJobIds.includes(job.id)}
                 onToggleSave={handleToggleSaveJob}
               />
@@ -283,6 +312,19 @@ export default function Home() {
         isOpen={isMyAppsModalOpen}
         onClose={() => setIsMyAppsModalOpen(false)}
       />
+
+      {/* Floating Action Toast (RemoteOK Style Clean Feedback) */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-800 flex items-center gap-3 animate-slideUp">
+          <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
+            ✓
+          </div>
+          <div className="text-xs">
+            <p className="font-bold text-white">{toastMessage}</p>
+            <p className="text-slate-400 text-[11px] mt-0.5">Zero middleman. Direct official company application.</p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

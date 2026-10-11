@@ -221,13 +221,19 @@ export default function JobCard({
                 <span>50/50 Capped</span>
               </button>
             ) : (
-              <button
-                onClick={() => onApplyClick(job)}
-                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
+              <a
+                href={job.applyUrl || (job.contactEmail ? `mailto:${job.contactEmail}` : "#")}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onApplyClick(job);
+                }}
+                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
               >
-                <Send className="w-3.5 h-3.5" />
-                <span>1-Click Apply</span>
-              </button>
+                <span>Apply on Company Site</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             )}
           </div>
         </div>
@@ -320,13 +326,16 @@ export default function JobCard({
                   Application Cap Reached (50/50)
                 </button>
               ) : (
-                <button
+                <a
+                  href={job.applyUrl || (job.contactEmail ? `mailto:${job.contactEmail}` : "#")}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => onApplyClick(job)}
                   className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Submit 1-Click Application ({spotsLeft} spots left)</span>
-                </button>
+                  <span>Apply on Official Company Careers Site</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               )}
             </div>
           </div>

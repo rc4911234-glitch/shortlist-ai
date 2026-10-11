@@ -318,7 +318,7 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
                     <span>🎉 100% Free Launch Promotion</span>
                   </div>
                   <div className="text-sm font-bold text-slate-200 mt-1">
-                    Free for First 20 Verified Startups <span className="text-xs text-slate-400 line-through">(Normally ₹1,999)</span>
+                    Free for First 20 Verified Startups <span className="text-xs text-slate-400 line-through">(Standard: $199 / ₹14,999)</span>
                   </div>
                 </div>
 
