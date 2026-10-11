@@ -21,9 +21,54 @@ import {
   Share2,
   Check,
   QrCode,
-  CreditCard
+  CreditCard,
+  Palette,
+  Layout,
+  Layers,
+  Award
 } from "lucide-react";
 import confetti from "canvas-confetti";
+
+type TemplateId = "harvard" | "silicon" | "executive" | "compact";
+
+interface TemplateOption {
+  id: TemplateId;
+  name: string;
+  tag: string;
+  category: string;
+  description: string;
+}
+
+const TEMPLATES: TemplateOption[] = [
+  {
+    id: "harvard",
+    name: "Harvard Classic",
+    tag: "Ivy League Standard",
+    category: "Traditional Serif",
+    description: "Centered header with elegant Georgia serif typography. The gold standard for top MNCs & finance."
+  },
+  {
+    id: "silicon",
+    name: "Silicon Modern",
+    tag: "Startups & Tech",
+    category: "Modern Sans-Serif",
+    description: "Crisp modern tech aesthetic with left alignment, tech badge pills, and clean rose accents."
+  },
+  {
+    id: "executive",
+    name: "Executive Slate",
+    tag: "Staff / Senior Level",
+    category: "High-Contrast Leadership",
+    description: "Deep charcoal top bar, authoritative hierarchy, and prominent metric-focused layout."
+  },
+  {
+    id: "compact",
+    name: "Compact Minimalist",
+    tag: "1-Page Guarantee",
+    category: "High Density Layout",
+    description: "Space-saving density ensuring heavy engineering projects & skills fit on a single clean page."
+  }
+];
 
 interface ExperienceItem {
   id: string;
@@ -102,6 +147,9 @@ export default function ResumeBuilderPage() {
 
   // Education
   const [education, setEducation] = useState("B.Tech in Computer Science & Engineering • 2017 - 2021 • GPA: 8.6/10");
+
+  // Template Selection
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("harvard");
 
   // Payment & Download Modal
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -218,13 +266,13 @@ export default function ResumeBuilderPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 mb-1">
               <Sparkles className="w-3.5 h-3.5 text-rose-600" />
-              <span>Harvard & Stanford Single-Column Format</span>
+              <span>4 Certified Single-Column ATS Templates</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               ATS-Optimized Resume Builder
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Passes 99% of company ATS parsers (Greenhouse, Lever, Ashby, Workday). Live real-time preview.
+              Passes 99% of company ATS parsers (Greenhouse, Lever, Ashby, Workday). Pick your preferred style below.
             </p>
           </div>
 
@@ -249,6 +297,79 @@ export default function ResumeBuilderPage() {
             >
               Live Preview
             </button>
+          </div>
+        </div>
+
+        {/* Template Selector Bar (Print: hidden) */}
+        <div className="mb-6 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Palette className="w-4 h-4 text-rose-600" />
+                <h2 className="text-sm font-extrabold text-slate-900">
+                  Select Resume Template Style
+                </h2>
+                <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">
+                  — Updates formatting instantly without altering data
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Every template follows single-column ATS specifications guaranteed readable by automated HR software.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="text-[11px] font-bold text-slate-500">Active:</span>
+              <span className="text-xs font-extrabold text-rose-700 bg-rose-50 border border-rose-200 px-3 py-0.5 rounded-full">
+                {TEMPLATES.find((t) => t.id === selectedTemplate)?.name}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {TEMPLATES.map((tmpl) => {
+              const isSelected = selectedTemplate === tmpl.id;
+              return (
+                <button
+                  key={tmpl.id}
+                  type="button"
+                  onClick={() => setSelectedTemplate(tmpl.id)}
+                  className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between group ${
+                    isSelected
+                      ? "border-rose-600 bg-rose-50/50 ring-2 ring-rose-500/25 shadow-sm"
+                      : "border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-300 hover:shadow-xs"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-2.5">
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        isSelected 
+                          ? "bg-rose-600 text-white" 
+                          : "bg-slate-200 text-slate-700 group-hover:bg-slate-300"
+                      }`}>
+                        {tmpl.tag}
+                      </span>
+                      {isSelected ? (
+                        <span className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </span>
+                      ) : (
+                        <span className="w-5 h-5 rounded-full border border-slate-300 bg-white flex items-center justify-center shrink-0 group-hover:border-slate-400" />
+                      )}
+                    </div>
+                    <div className="font-extrabold text-slate-900 text-sm">
+                      {tmpl.name}
+                    </div>
+                    <div className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                      {tmpl.category}
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-600 mt-3 leading-relaxed">
+                    {tmpl.description}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -507,116 +628,105 @@ export default function ResumeBuilderPage() {
             <div className="mb-3 flex items-center justify-between px-2 print:hidden">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
                 <Eye className="w-4 h-4 text-slate-400" />
-                <span>ATS Formatted Document Preview (A4 Single Column)</span>
+                <span>
+                  Previewing: <strong className="text-slate-800">{TEMPLATES.find((t) => t.id === selectedTemplate)?.name}</strong>
+                </span>
               </div>
 
-              <button
-                onClick={handlePrintDownload}
-                className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1"
-              >
-                <span>Export PDF</span>
-                <Download className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => setSelectedTemplate(e.target.value as TemplateId)}
+                  className="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-xl px-2.5 py-1 outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer shadow-xs"
+                >
+                  {TEMPLATES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={handlePrintDownload}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 bg-white px-3 py-1 rounded-xl border border-rose-200 hover:border-rose-300 shadow-xs transition-all hover:scale-105"
+                >
+                  <span>Export PDF</span>
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
 
-            {/* The Actual Resume Sheet (Harvard Format) */}
-            <div 
-              id="resume-document"
-              className="bg-white rounded-2xl shadow-xl border border-slate-300 p-8 sm:p-12 text-slate-900 font-serif leading-relaxed text-xs selection:bg-rose-100"
-              style={{ minHeight: "1050px", fontFamily: "'Georgia', 'Times New Roman', serif" }}
-            >
-              
-              {/* Header: Candidate Identity */}
-              <div className="text-center pb-4 border-b border-slate-800 space-y-1">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-950 uppercase" style={{ letterSpacing: "1px" }}>
-                  {fullName}
-                </h1>
-                <div className="text-sm font-semibold text-slate-700 font-sans tracking-wide">
-                  {jobTitle}
+            {/* Template 1: Harvard Classic (Ivy League Serif) */}
+            {selectedTemplate === "harvard" && (
+              <div 
+                id="resume-document"
+                className="bg-white rounded-2xl shadow-xl border border-slate-300 p-8 sm:p-12 text-slate-900 font-serif leading-relaxed text-xs selection:bg-rose-100"
+                style={{ minHeight: "1050px", fontFamily: "'Georgia', 'Times New Roman', serif" }}
+              >
+                {/* Header: Candidate Identity */}
+                <div className="text-center pb-4 border-b border-slate-800 space-y-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-950 uppercase" style={{ letterSpacing: "1px" }}>
+                    {fullName}
+                  </h1>
+                  <div className="text-sm font-semibold text-slate-700 font-sans tracking-wide">
+                    {jobTitle}
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 text-[11px] text-slate-600 font-sans pt-1">
+                    <span>{location}</span>
+                    <span>•</span>
+                    <span>{phone}</span>
+                    <span>•</span>
+                    <span className="text-rose-700 font-semibold">{email}</span>
+                    <span>•</span>
+                    <span>{linkedin}</span>
+                    <span>•</span>
+                    <span>{github}</span>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-center gap-2.5 text-[11px] text-slate-600 font-sans pt-1">
-                  <span>{location}</span>
-                  <span>•</span>
-                  <span>{phone}</span>
-                  <span>•</span>
-                  <span className="text-rose-700 font-semibold">{email}</span>
-                  <span>•</span>
-                  <span>{linkedin}</span>
-                  <span>•</span>
-                  <span>{github}</span>
-                </div>
-              </div>
 
-              {/* Summary */}
-              {summary && (
-                <div className="pt-4 space-y-1">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
-                    Professional Summary
-                  </h2>
-                  <p className="text-[11.5px] text-slate-800 leading-relaxed pt-1">
-                    {summary}
-                  </p>
-                </div>
-              )}
+                {/* Summary */}
+                {summary && (
+                  <div className="pt-4 space-y-1">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Professional Summary
+                    </h2>
+                    <p className="text-[11.5px] text-slate-800 leading-relaxed pt-1">
+                      {summary}
+                    </p>
+                  </div>
+                )}
 
-              {/* Technical Skills */}
-              {skills && (
-                <div className="pt-4 space-y-1">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
-                    Technical Core Proficiencies
-                  </h2>
-                  <p className="text-[11.5px] text-slate-800 pt-1 leading-relaxed">
-                    <b>Core Technologies:</b> {skills}
-                  </p>
-                </div>
-              )}
+                {/* Technical Skills */}
+                {skills && (
+                  <div className="pt-4 space-y-1">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Technical Core Proficiencies
+                    </h2>
+                    <p className="text-[11.5px] text-slate-800 pt-1 leading-relaxed">
+                      <b>Core Technologies:</b> {skills}
+                    </p>
+                  </div>
+                )}
 
-              {/* Work Experience */}
-              <div className="pt-4 space-y-2">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
-                  Professional Work Experience
-                </h2>
-
-                <div className="space-y-3.5 pt-1">
-                  {experiences.map((exp) => (
-                    <div key={exp.id} className="space-y-1">
-                      <div className="flex items-baseline justify-between font-sans">
-                        <div>
-                          <span className="font-bold text-slate-950 text-xs">{exp.role}</span>
-                          <span className="text-slate-600 font-medium"> — {exp.company}</span>
-                        </div>
-                        <span className="text-[11px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
-                      </div>
-
-                      <ul className="list-disc list-outside pl-4 space-y-1 text-[11px] text-slate-800 leading-relaxed">
-                        {exp.bullets.map((b, i) => (
-                          <li key={i}>{b}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Key Projects */}
-              {projects.length > 0 && (
+                {/* Work Experience */}
                 <div className="pt-4 space-y-2">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
-                    Engineering Projects & Open Source
+                    Professional Work Experience
                   </h2>
 
-                  <div className="space-y-2.5 pt-1">
-                    {projects.map((proj) => (
-                      <div key={proj.id} className="space-y-0.5">
+                  <div className="space-y-3.5 pt-1">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="space-y-1">
                         <div className="flex items-baseline justify-between font-sans">
                           <div>
-                            <span className="font-bold text-slate-950 text-xs">{proj.title}</span>
-                            <span className="text-slate-500 text-[11px]"> ({proj.tech})</span>
+                            <span className="font-bold text-slate-950 text-xs">{exp.role}</span>
+                            <span className="text-slate-600 font-medium"> — {exp.company}</span>
                           </div>
-                          <span className="text-[11px] text-rose-700 font-mono">{proj.link}</span>
+                          <span className="text-[11px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
                         </div>
-                        <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-800 leading-relaxed">
-                          {proj.bullets.map((b, i) => (
+
+                        <ul className="list-disc list-outside pl-4 space-y-1 text-[11px] text-slate-800 leading-relaxed">
+                          {exp.bullets.map((b, i) => (
                             <li key={i}>{b}</li>
                           ))}
                         </ul>
@@ -624,21 +734,445 @@ export default function ResumeBuilderPage() {
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* Education */}
-              {education && (
-                <div className="pt-4 space-y-1">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
-                    Education & Credentials
-                  </h2>
-                  <p className="text-[11.5px] text-slate-800 pt-1 font-sans">
-                    {education}
-                  </p>
+                {/* Key Projects */}
+                {projects.length > 0 && (
+                  <div className="pt-4 space-y-2">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Engineering Projects & Open Source
+                    </h2>
+
+                    <div className="space-y-2.5 pt-1">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="space-y-0.5">
+                          <div className="flex items-baseline justify-between font-sans">
+                            <div>
+                              <span className="font-bold text-slate-950 text-xs">{proj.title}</span>
+                              <span className="text-slate-500 text-[11px]"> ({proj.tech})</span>
+                            </div>
+                            <span className="text-[11px] text-rose-700 font-mono">{proj.link}</span>
+                          </div>
+                          <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-800 leading-relaxed">
+                            {proj.bullets.map((b, i) => (
+                              <li key={i}>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Education */}
+                {education && (
+                  <div className="pt-4 space-y-1">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Education & Credentials
+                    </h2>
+                    <p className="text-[11.5px] text-slate-800 pt-1 font-sans">
+                      {education}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Template 2: Silicon Modern (Tech Startups Sans-Serif) */}
+            {selectedTemplate === "silicon" && (
+              <div 
+                id="resume-document"
+                className="bg-white rounded-2xl shadow-xl border border-slate-300 p-8 sm:p-11 text-slate-900 font-sans leading-relaxed text-xs selection:bg-rose-100"
+                style={{ minHeight: "1050px" }}
+              >
+                {/* Header: Left aligned tech startup aesthetic */}
+                <div className="pb-4 border-b-2 border-slate-200 space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
+                        {fullName}
+                      </h1>
+                      <div className="text-xs font-bold text-rose-600 mt-0.5 tracking-wide">
+                        {jobTitle}
+                      </div>
+                    </div>
+                    <div className="self-start sm:self-auto px-2.5 py-1 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold">
+                      {location}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600 pt-1">
+                    <span className="font-medium text-slate-900">{phone}</span>
+                    <span>•</span>
+                    <span className="text-rose-600 font-bold">{email}</span>
+                    <span>•</span>
+                    <span className="text-slate-700 font-medium">{linkedin}</span>
+                    <span>•</span>
+                    <span className="text-slate-700 font-medium">{github}</span>
+                  </div>
                 </div>
-              )}
 
-            </div>
+                {/* Summary */}
+                {summary && (
+                  <div className="pt-4 space-y-1.5">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-rose-600 pl-2.5 py-0.5">
+                      Profile & Impact
+                    </h2>
+                    <p className="text-[11.5px] text-slate-700 leading-relaxed pl-3.5">
+                      {summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* Technical Skills */}
+                {skills && (
+                  <div className="pt-4 space-y-1.5">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-rose-600 pl-2.5 py-0.5">
+                      Tech Stack & Proficiencies
+                    </h2>
+                    <div className="pl-3.5 text-[11.5px] text-slate-700 leading-relaxed">
+                      <span className="font-bold text-slate-900">Key Technologies: </span>
+                      <span>{skills}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Work Experience */}
+                <div className="pt-4 space-y-2.5">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-rose-600 pl-2.5 py-0.5">
+                    Work Experience
+                  </h2>
+
+                  <div className="space-y-4 pl-3.5 pt-1">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="space-y-1.5">
+                        <div className="flex items-baseline justify-between">
+                          <div>
+                            <span className="font-extrabold text-slate-950 text-xs">{exp.role}</span>
+                            <span className="text-rose-600 font-bold ml-1.5">@{exp.company}</span>
+                            <span className="text-slate-400 text-[10px] ml-1.5">({exp.location})</span>
+                          </div>
+                          <span className="text-[10.5px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono font-bold shrink-0">
+                            {exp.duration}
+                          </span>
+                        </div>
+
+                        <ul className="list-disc list-outside pl-4 space-y-1 text-[11px] text-slate-700 leading-relaxed">
+                          {exp.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Key Projects */}
+                {projects.length > 0 && (
+                  <div className="pt-4 space-y-2.5">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-rose-600 pl-2.5 py-0.5">
+                      Featured Engineering Projects
+                    </h2>
+
+                    <div className="space-y-3 pl-3.5 pt-1">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="space-y-1">
+                          <div className="flex items-baseline justify-between">
+                            <div>
+                              <span className="font-extrabold text-slate-950 text-xs">{proj.title}</span>
+                              <span className="text-slate-500 text-[11px] ml-1.5">[{proj.tech}]</span>
+                            </div>
+                            <span className="text-[11px] text-rose-600 font-mono font-bold">{proj.link}</span>
+                          </div>
+                          <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-700 leading-relaxed">
+                            {proj.bullets.map((b, i) => (
+                              <li key={i}>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Education */}
+                {education && (
+                  <div className="pt-4 space-y-1.5">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-rose-600 pl-2.5 py-0.5">
+                      Education
+                    </h2>
+                    <p className="text-[11.5px] text-slate-700 pl-3.5 font-medium">
+                      {education}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Template 3: Executive Slate (Senior / Staff / Leadership) */}
+            {selectedTemplate === "executive" && (
+              <div 
+                id="resume-document"
+                className="bg-white rounded-2xl shadow-xl border border-slate-300 p-8 sm:p-12 text-slate-900 font-sans leading-relaxed text-xs selection:bg-rose-100 border-t-8 border-t-slate-900"
+                style={{ minHeight: "1050px" }}
+              >
+                {/* Executive Header */}
+                <div className="pb-4 space-y-1.5 border-b-2 border-slate-900">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 uppercase">
+                      {fullName}
+                    </h1>
+                    <div className="text-xs font-black tracking-widest text-slate-500 uppercase">
+                      {jobTitle}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-600 pt-1 font-medium">
+                    <span>{location}</span>
+                    <span>•</span>
+                    <span>{phone}</span>
+                    <span>•</span>
+                    <span className="font-bold text-slate-900">{email}</span>
+                    <span>•</span>
+                    <span>{linkedin}</span>
+                    <span>•</span>
+                    <span>{github}</span>
+                  </div>
+                </div>
+
+                {/* Executive Summary */}
+                {summary && (
+                  <div className="pt-4 space-y-1">
+                    <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">
+                        Executive Summary
+                      </h2>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Leadership & Impact</span>
+                    </div>
+                    <p className="text-[11.5px] text-slate-800 leading-relaxed pt-1.5 font-normal">
+                      {summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* Core Competencies */}
+                {skills && (
+                  <div className="pt-4 space-y-1">
+                    <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">
+                        Core Competencies & Stack
+                      </h2>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Technical Domain</span>
+                    </div>
+                    <p className="text-[11.5px] text-slate-800 pt-1.5 leading-relaxed">
+                      <strong className="text-slate-950">Technical Architecture & Tools:</strong> {skills}
+                    </p>
+                  </div>
+                )}
+
+                {/* Professional Experience */}
+                <div className="pt-4 space-y-2">
+                  <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">
+                      Professional Experience & Track Record
+                    </h2>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Chronological</span>
+                  </div>
+
+                  <div className="space-y-4 pt-1.5">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="space-y-1">
+                        <div className="flex items-baseline justify-between">
+                          <div>
+                            <span className="font-black text-slate-950 text-xs uppercase">{exp.company}</span>
+                            <span className="text-slate-700 font-semibold italic text-xs ml-2">— {exp.role}</span>
+                          </div>
+                          <span className="text-[11px] text-slate-600 font-mono font-bold shrink-0">
+                            {exp.duration} | {exp.location}
+                          </span>
+                        </div>
+
+                        <ul className="list-disc list-outside pl-4 space-y-1 text-[11px] text-slate-800 leading-relaxed">
+                          {exp.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Projects */}
+                {projects.length > 0 && (
+                  <div className="pt-4 space-y-2">
+                    <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">
+                        Key Architecture Projects
+                      </h2>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Systems & Delivery</span>
+                    </div>
+
+                    <div className="space-y-3 pt-1.5">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="space-y-0.5">
+                          <div className="flex items-baseline justify-between">
+                            <div>
+                              <span className="font-black text-slate-950 text-xs">{proj.title}</span>
+                              <span className="text-slate-600 text-[11px] font-medium ml-2">({proj.tech})</span>
+                            </div>
+                            <span className="text-[11px] text-slate-900 font-mono font-bold">{proj.link}</span>
+                          </div>
+                          <ul className="list-disc list-outside pl-4 space-y-0.5 text-[11px] text-slate-800 leading-relaxed">
+                            {proj.bullets.map((b, i) => (
+                              <li key={i}>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Education */}
+                {education && (
+                  <div className="pt-4 space-y-1">
+                    <div className="border-b-2 border-slate-900 pb-1 flex items-center justify-between">
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-950">
+                        Education & Credentials
+                      </h2>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Credentials</span>
+                    </div>
+                    <p className="text-[11.5px] text-slate-800 pt-1.5 font-medium">
+                      {education}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Template 4: Compact Minimalist (1-Page High Density) */}
+            {selectedTemplate === "compact" && (
+              <div 
+                id="resume-document"
+                className="bg-white rounded-2xl shadow-xl border border-slate-300 p-6 sm:p-8 text-slate-900 font-sans leading-snug text-[10.5px] selection:bg-rose-100"
+                style={{ minHeight: "1050px" }}
+              >
+                {/* Ultra Compact Header */}
+                <div className="border-b border-slate-300 pb-2 space-y-1">
+                  <div className="flex items-baseline justify-between">
+                    <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-950">
+                      {fullName}
+                    </h1>
+                    <div className="text-xs font-bold text-slate-600">
+                      {jobTitle}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] text-slate-600 pt-0.5">
+                    <span>{location}</span>
+                    <span>•</span>
+                    <span>{phone}</span>
+                    <span>•</span>
+                    <span className="font-bold text-rose-600">{email}</span>
+                    <span>•</span>
+                    <span>{linkedin}</span>
+                    <span>•</span>
+                    <span>{github}</span>
+                  </div>
+                </div>
+
+                {/* Summary */}
+                {summary && (
+                  <div className="pt-2.5 space-y-0.5">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Summary
+                    </h2>
+                    <p className="text-[10.5px] text-slate-800 leading-normal pt-0.5">
+                      {summary}
+                    </p>
+                  </div>
+                )}
+
+                {/* Skills */}
+                {skills && (
+                  <div className="pt-2.5 space-y-0.5">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Skills
+                    </h2>
+                    <p className="text-[10.5px] text-slate-800 pt-0.5 leading-normal">
+                      <span className="font-bold">Proficiencies:</span> {skills}
+                    </p>
+                  </div>
+                )}
+
+                {/* Experience */}
+                <div className="pt-2.5 space-y-1.5">
+                  <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                    Experience
+                  </h2>
+
+                  <div className="space-y-2 pt-0.5">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="space-y-0.5">
+                        <div className="flex items-baseline justify-between">
+                          <div>
+                            <span className="font-bold text-slate-950">{exp.role}</span>
+                            <span className="text-slate-600"> — {exp.company}</span>
+                            <span className="text-slate-400 text-[9.5px]"> ({exp.location})</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-mono shrink-0">{exp.duration}</span>
+                        </div>
+
+                        <ul className="list-disc list-outside pl-3.5 space-y-0.5 text-[10px] text-slate-800 leading-normal">
+                          {exp.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Projects */}
+                {projects.length > 0 && (
+                  <div className="pt-2.5 space-y-1.5">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Projects
+                    </h2>
+
+                    <div className="space-y-1.5 pt-0.5">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="space-y-0.5">
+                          <div className="flex items-baseline justify-between">
+                            <div>
+                              <span className="font-bold text-slate-950">{proj.title}</span>
+                              <span className="text-slate-500 text-[10px]"> ({proj.tech})</span>
+                            </div>
+                            <span className="text-[10px] text-rose-600 font-mono">{proj.link}</span>
+                          </div>
+                          <ul className="list-disc list-outside pl-3.5 space-y-0.5 text-[10px] text-slate-800 leading-normal">
+                            {proj.bullets.map((b, i) => (
+                              <li key={i}>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Education */}
+                {education && (
+                  <div className="pt-2.5 space-y-0.5">
+                    <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5">
+                      Education
+                    </h2>
+                    <p className="text-[10.5px] text-slate-800 pt-0.5">
+                      {education}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Candidate Monetization Banner */}
             <div className="mt-4 p-4 rounded-2xl bg-slate-900 text-white flex items-center justify-between gap-4 print:hidden shadow-lg">
@@ -677,15 +1211,15 @@ export default function ResumeBuilderPage() {
                 Download ATS-Pro PDF
               </h3>
               <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
-                Get the clean, single-column Harvard format PDF that passes automated recruitment filters at top tech startups.
+                Unlock all 4 ATS-Certified templates (Harvard Classic, Silicon Modern, Executive Slate & Compact Minimalist) with unlimited exports.
               </p>
             </div>
 
             {/* Pricing Tag */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-left">
               <div>
-                <span className="font-bold text-slate-900 block text-sm">Lifetime Pro PDF Export</span>
-                <span className="text-xs text-slate-500">Instant PDF download + unlimited edits</span>
+                <span className="font-bold text-slate-900 block text-sm">Lifetime Pro PDF Access</span>
+                <span className="text-xs text-slate-500">All 4 templates + unlimited edits & downloads</span>
               </div>
               <div className="text-right">
                 <span className="text-2xl font-black text-rose-600">₹99</span>
@@ -697,15 +1231,15 @@ export default function ResumeBuilderPage() {
             <div className="space-y-2 text-left text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>All 4 ATS styles: Harvard, Silicon, Executive & Compact</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Zero tables or columns (100% readable by ATS bots)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Action verb & quantifiable metric formula</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Instant download directly in your browser</span>
+                <span>Instant vector PDF download directly in your browser</span>
               </div>
             </div>
 
