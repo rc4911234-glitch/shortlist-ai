@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Sparkles, Zap, ArrowDown, Users, CheckCircle2, DollarSign, Clock } from "lucide-react";
+import Link from "next/link";
+import { ShieldCheck, Sparkles, Zap, ArrowDown, Users, CheckCircle2, DollarSign, Clock, Plus } from "lucide-react";
 
 interface HeroProps {
   onOpenAlerts: () => void;
@@ -71,15 +72,23 @@ export default function Hero({ onOpenAlerts, onOpenPostJob }: HeroProps) {
           </div>
         </div>
 
-        {/* Quick candidate action banner */}
+        {/* Quick candidate and founder action banner */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <button
             onClick={onOpenAlerts}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Get WhatsApp Alerts When a New 50-Spot Job Drops</span>
+            <span>Get WhatsApp Alerts for New 50-Spot Jobs</span>
           </button>
+
+          <Link
+            href="/post-a-job"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-xl border border-rose-200 shadow-sm transition-all hover:scale-105"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+            <span>Post a Job for Free ($199 Value)</span>
+          </Link>
         </div>
 
       </div>

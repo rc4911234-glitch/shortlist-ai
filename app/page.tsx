@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FilterBar from "@/components/FilterBar";
@@ -277,13 +278,13 @@ export default function Home() {
             </p>
           </div>
 
-          <button
-            onClick={() => setIsPostJobModalOpen(true)}
+          <Link
+            href="/post-a-job"
             className="shrink-0 px-6 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Post a Job for Free</span>
-          </button>
+          </Link>
         </div>
 
       </section>
