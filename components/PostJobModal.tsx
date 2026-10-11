@@ -82,9 +82,14 @@ export default function PostJobModal({ isOpen, onClose, onJobPublished }: PostJo
       postedAt: "Just now",
       featured: pinToTop,
       highlighted: highlightYellow,
+      experienceLevel: "Mid-Level (2-5 Yrs)",
+      currency: salary.includes("$") ? "USD" : "INR",
+      perks: ["🏝 100% Remote", "💻 Equipment Budget", "🚀 Equity Grants"],
+      status: "open",
       applicantsCount: 1,
       maxApplicants: 50,
-      contactEmail: contactEmail || `careers@${company.toLowerCase().replace(/[^a-z]/g, '')}.com`
+      contactEmail: contactEmail || `careers@${company.toLowerCase().replace(/[^a-z]/g, '')}.com`,
+      employerToken: `tok_${Math.random().toString(36).substring(7)}`
     };
 
     // Post to backend API

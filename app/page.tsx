@@ -8,48 +8,76 @@ import JobCard from "@/components/JobCard";
 import PostJobModal from "@/components/PostJobModal";
 import AlertModal from "@/components/AlertModal";
 import ApplyModal from "@/components/ApplyModal";
+import MyApplicationsModal from "@/components/MyApplicationsModal";
 import Footer from "@/components/Footer";
 import { INITIAL_JOBS } from "@/lib/jobsData";
-import { Job, JobCategory } from "@/lib/types";
-import { Briefcase, Plus, Sparkles } from "lucide-react";
+import { Job, JobCategory, ExperienceFilter, CurrencyFilter } from "@/lib/types";
+import { Briefcase, Plus, Sparkles, Heart } from "lucide-react";
 
 export default function Home() {
   const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS);
   const [selectedCategory, setSelectedCategory] = useState<JobCategory>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"latest" | "urgency" | "salary">("latest");
+  const [experienceFilter, setExperienceFilter] = useState<ExperienceFilter>("All");
+  const [currencyFilter, setCurrencyFilter] = useState<CurrencyFilter>("All");
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
+  const [appliedCount, setAppliedCount] = useState(0);
+
+  // Modals state
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-
-  // In-App 1-Click Apply state
+  const [isMyAppsModalOpen, setIsMyAppsModalOpen] = useState(false);
   const [jobForApply, setJobForApply] = useState<Job | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
-  // Load any previously posted jobs from localStorage on mount
+  // Fetch jobs from backend API on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("custom_posted_jobs");
-      if (stored) {
-        const parsed: Job[] = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setJobs([...parsed, ...INITIAL_JOBS]);
+    async function loadJobs() {
+      try {
+        const res = await fetch("/api/jobs");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.jobs) && data.jobs.length > 0) {
+          setJobs(data.jobs);
         }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadJobs();
+
+    // Load saved jobs and applied count from localStorage
+    try {
+      const storedSaved = localStorage.getItem("saved_jobs_list");
+      if (storedSaved) setSavedJobIds(JSON.parse(storedSaved));
+
+      const storedApps = localStorage.getItem("my_submitted_applications");
+      if (storedApps) {
+        const parsed = JSON.parse(storedApps);
+        if (Array.isArray(parsed)) setAppliedCount(parsed.length);
       }
     } catch (e) {
       console.error(e);
     }
   }, []);
 
+  const handleToggleSaveJob = (jobId: string) => {
+    setSavedJobIds(prev => {
+      const updated = prev.includes(jobId) 
+        ? prev.filter(id => id !== jobId) 
+        : [...prev, jobId];
+      try {
+        localStorage.setItem("saved_jobs_list", JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
   const handleJobPublished = (newJob: Job) => {
-    const updated = [newJob, ...jobs];
-    setJobs(updated);
-    try {
-      const stored = localStorage.getItem("custom_posted_jobs");
-      const prevList = stored ? JSON.parse(stored) : [];
-      localStorage.setItem("custom_posted_jobs", JSON.stringify([newJob, ...prevList]));
-    } catch (e) {
-      console.error(e);
-    }
+    setJobs(prev => [newJob, ...prev]);
   };
 
   const handleOpenApplyModal = (job: Job) => {
@@ -58,9 +86,15 @@ export default function Home() {
   };
 
   const handleApplicationSubmitted = (jobId: string) => {
+    setAppliedCount(prev => prev + 1);
     setJobs(prev => prev.map(j => {
       if (j.id === jobId && j.applicantsCount < j.maxApplicants) {
-        return { ...j, applicantsCount: j.applicantsCount + 1 };
+        const newCount = j.applicantsCount + 1;
+        return { 
+          ...j, 
+          applicantsCount: newCount,
+          status: newCount >= j.maxApplicants ? "capped" : j.status
+        };
       }
       return j;
     }));
@@ -68,6 +102,11 @@ export default function Home() {
 
   // Filter jobs
   const filteredJobs = jobs.filter(job => {
+    // Saved only filter
+    if (showSavedOnly && !savedJobIds.includes(job.id)) {
+      return false;
+    }
+
     // Category match
     if (selectedCategory !== "All") {
       if (selectedCategory === "Remote Worldwide") {
@@ -75,6 +114,16 @@ export default function Home() {
       } else if (job.category !== selectedCategory) {
         return false;
       }
+    }
+
+    // Experience match
+    if (experienceFilter !== "All" && job.experienceLevel !== experienceFilter) {
+      return false;
+    }
+
+    // Currency match
+    if (currencyFilter !== "All" && job.currency !== currencyFilter) {
+      return false;
     }
 
     // Search query match
@@ -95,10 +144,8 @@ export default function Home() {
   // Sort jobs
   const sortedJobs = [...filteredJobs].sort((a, b) => {
     if (sortBy === "urgency") {
-      // Closest to 50 cap first
       return b.applicantsCount - a.applicantsCount;
     }
-    // Default: featured first, then original order
     if (a.featured && !b.featured) return -1;
     if (!a.featured && b.featured) return 1;
     return 0;
@@ -109,6 +156,8 @@ export default function Home() {
       <Navbar
         onOpenPostJob={() => setIsPostJobModalOpen(true)}
         onOpenAlerts={() => setIsAlertModalOpen(true)}
+        onOpenMyApplications={() => setIsMyAppsModalOpen(true)}
+        appliedCount={appliedCount}
       />
 
       <Hero
@@ -123,6 +172,13 @@ export default function Home() {
         onSearchChange={setSearchQuery}
         sortBy={sortBy}
         onSortChange={setSortBy}
+        experienceFilter={experienceFilter}
+        onExperienceFilterChange={setExperienceFilter}
+        currencyFilter={currencyFilter}
+        onCurrencyFilterChange={setCurrencyFilter}
+        showSavedOnly={showSavedOnly}
+        onToggleShowSavedOnly={() => setShowSavedOnly(!showSavedOnly)}
+        savedCount={savedJobIds.length}
         totalCount={sortedJobs.length}
       />
 
@@ -136,6 +192,8 @@ export default function Home() {
                 key={job.id}
                 job={job}
                 onApplyClick={handleOpenApplyModal}
+                isSaved={savedJobIds.includes(job.id)}
+                onToggleSave={handleToggleSaveJob}
               />
             ))}
           </div>
@@ -144,25 +202,32 @@ export default function Home() {
             <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <Briefcase className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No Jobs Found Matching "{searchQuery}"</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {showSavedOnly ? "You haven't bookmarked any jobs yet" : `No Jobs Found Matching "${searchQuery}"`}
+            </h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-6">
-              Try clearing your search query or switching categories. Or be the first company to post a role in this category!
+              {showSavedOnly 
+                ? "Click the heart icon on any job card to save it for easy access." 
+                : "Try adjusting your filters or currency. Or be the first company to post in this category!"}
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCategory("All");
+                  setExperienceFilter("All");
+                  setCurrencyFilter("All");
+                  setShowSavedOnly(false);
                 }}
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
               >
-                Reset Filters
+                Reset All Filters
               </button>
               <button
                 onClick={() => setIsPostJobModalOpen(true)}
                 className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all"
               >
-                + Post This Job
+                + Post a Job
               </button>
             </div>
           </div>
@@ -207,12 +272,16 @@ export default function Home() {
         onClose={() => setIsAlertModalOpen(false)}
       />
 
-      {/* 1-Click In-App Direct Application Modal */}
       <ApplyModal
         job={jobForApply}
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         onApplicationSubmitted={handleApplicationSubmitted}
+      />
+
+      <MyApplicationsModal
+        isOpen={isMyAppsModalOpen}
+        onClose={() => setIsMyAppsModalOpen(false)}
       />
     </main>
   );

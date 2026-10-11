@@ -18,8 +18,11 @@ export async function POST(request: Request) {
       location: body.location || "Remote",
       type: body.type || "Full-Time",
       category: body.category || "Engineering",
+      experienceLevel: body.experienceLevel || "Mid-Level (2-5 Yrs)",
       salary: body.salary || "₹18L - ₹28L / yr",
+      currency: body.currency || (body.salary?.includes("$") ? "USD" : "INR"),
       skills: Array.isArray(body.skills) ? body.skills : (body.skills ? body.skills.split(",").map((s: string) => s.trim()) : []),
+      perks: body.perks || ["🏝 100% Remote", "💻 Equipment Budget"],
       description: body.description || "",
       responsibilities: body.responsibilities || [],
       requirements: body.requirements || [],
@@ -27,9 +30,11 @@ export async function POST(request: Request) {
       postedAt: "Just now",
       featured: Boolean(body.featured),
       highlighted: Boolean(body.highlighted),
+      status: body.status || "open",
       applicantsCount: 0,
       maxApplicants: body.maxApplicants || 50,
-      contactEmail: body.contactEmail || `careers@${body.company.toLowerCase().replace(/[^a-z]/g, '')}.com`
+      contactEmail: body.contactEmail || `careers@${body.company.toLowerCase().replace(/[^a-z]/g, '')}.com`,
+      employerToken: body.employerToken || `tok_${Math.random().toString(36).substring(7)}`
     };
 
     const saved = addJob(newJob);

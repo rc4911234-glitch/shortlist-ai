@@ -1,22 +1,9 @@
-import { Job } from "./types";
+import { Job, CandidateApplication, JobAlertSubscriber } from "./types";
 import { INITIAL_JOBS } from "./jobsData";
 
-export interface CandidateApplication {
-  id: string;
-  jobId: string;
-  jobTitle: string;
-  company: string;
-  fullName: string;
-  email: string;
-  phone?: string;
-  linkedin?: string;
-  experience: string;
-  pitch?: string;
-  resumeText: string;
-  submittedAt: string;
-}
+export type { CandidateApplication };
 
-// In-memory server store (persists during runtime across requests)
+// In-memory server store (persists across requests)
 let serverJobs: Job[] = [...INITIAL_JOBS];
 let serverApplications: CandidateApplication[] = [
   {
@@ -31,7 +18,8 @@ let serverApplications: CandidateApplication[] = [
     experience: "3-5 years",
     pitch: "Built high-scale calendar integrations for 40k users, deep expertise in Next.js 14 App Router and Prisma.",
     resumeText: "Experienced Full Stack Engineer with 4 years building SaaS with Next.js, TypeScript, PostgreSQL.",
-    submittedAt: "Today, 1:15 PM"
+    submittedAt: "Today, 1:15 PM",
+    status: "shortlisted"
   },
   {
     id: "APP-82914",
@@ -45,7 +33,18 @@ let serverApplications: CandidateApplication[] = [
     experience: "1-3 years",
     pitch: "Wrote high-throughput concurrent Golang microservices processing 10k req/sec on Linux.",
     resumeText: "Systems engineer passionate about Linux internals, Golang concurrency, Redis and PostgreSQL performance tuning.",
-    submittedAt: "Today, 11:40 AM"
+    submittedAt: "Today, 11:40 AM",
+    status: "under_review"
+  }
+];
+
+let serverAlerts: JobAlertSubscriber[] = [
+  {
+    id: "SUB-101",
+    email: "rohit.builder@gmail.com",
+    phone: "+91 98765 00123",
+    role: "Engineering",
+    subscribedAt: "Today, 9:00 AM"
   }
 ];
 
@@ -66,15 +65,32 @@ export function deleteJob(id: string): boolean {
 
 export function incrementJobApplicantCount(jobId: string): Job | null {
   const job = serverJobs.find(j => j.id === jobId);
-  if (job && job.applicantsCount < job.maxApplicants) {
-    job.applicantsCount += 1;
+  if (job) {
+    if (job.applicantsCount < job.maxApplicants) {
+      job.applicantsCount += 1;
+    }
+    if (job.applicantsCount >= job.maxApplicants) {
+      job.status = "capped";
+    }
     return job;
   }
-  return job || null;
+  return null;
 }
 
-export function getApplications(): CandidateApplication[] {
+export function getApplications(jobId?: string): CandidateApplication[] {
+  if (jobId) {
+    return serverApplications.filter(a => a.jobId === jobId);
+  }
   return serverApplications;
+}
+
+export function updateApplicationStatus(id: string, status: CandidateApplication["status"]): CandidateApplication | null {
+  const app = serverApplications.find(a => a.id === id);
+  if (app) {
+    app.status = status;
+    return app;
+  }
+  return null;
 }
 
 export function addApplication(app: CandidateApplication): CandidateApplication {
@@ -83,12 +99,20 @@ export function addApplication(app: CandidateApplication): CandidateApplication 
   return app;
 }
 
+export function getAlerts(): JobAlertSubscriber[] {
+  return serverAlerts;
+}
+
+export function addAlert(alert: JobAlertSubscriber): JobAlertSubscriber {
+  serverAlerts = [alert, ...serverAlerts];
+  return alert;
+}
+
 export function getPlatformStats() {
   const totalJobs = serverJobs.length;
   const totalApplications = serverApplications.length;
-  // Estimate revenue based on custom jobs posted (e.g. ₹1,999 base + add-ons)
   const paidJobsCount = Math.max(3, serverJobs.filter(j => j.id.startsWith("job-") && !["job-1", "job-2", "job-3", "job-4", "job-5", "job-6", "job-7", "job-8"].includes(j.id)).length + 4);
-  const totalRevenueINR = (paidJobsCount * 1999) + 4496; // base + add-ons
+  const totalRevenueINR = (paidJobsCount * 1999) + 4496;
 
   return {
     totalJobs,
@@ -97,5 +121,6 @@ export function getPlatformStats() {
     totalRevenueUSD: Math.round(totalRevenueINR / 84),
     activeCandidatesCount: totalApplications + 148,
     averageReviewHours: "36 hrs",
+    totalSubscribers: serverAlerts.length + 320
   };
 }

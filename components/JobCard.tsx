@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Building2, 
   MapPin, 
@@ -12,37 +12,70 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Mail, 
-  Flame,
-  Sparkles,
-  Zap,
-  Send
+  Flame, 
+  Sparkles, 
+  Zap, 
+  Send, 
+  Heart, 
+  Share2, 
+  Lock, 
+  Check 
 } from "lucide-react";
 import { Job } from "@/lib/types";
 
 interface JobCardProps {
   job: Job;
   onApplyClick: (job: Job) => void;
+  isSaved?: boolean;
+  onToggleSave?: (jobId: string) => void;
 }
 
-export default function JobCard({ job, onApplyClick }: JobCardProps) {
+export default function JobCard({ 
+  job, 
+  onApplyClick, 
+  isSaved = false, 
+  onToggleSave 
+}: JobCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
-  const spotsLeft = job.maxApplicants - job.applicantsCount;
-  const isAlmostFull = spotsLeft <= 10;
+  const isCapped = job.status === "capped" || job.applicantsCount >= job.maxApplicants;
+  const spotsLeft = Math.max(0, job.maxApplicants - job.applicantsCount);
+  const isAlmostFull = !isCapped && spotsLeft <= 10;
   const progressPercent = Math.min(100, Math.round((job.applicantsCount / job.maxApplicants) * 100));
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareText = `Check out this 50-cap role: ${job.title} at ${job.company} (${job.salary}) on ZeroSpamJobs! https://idea-disuess.vercel.app`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
 
   return (
     <div 
-      className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
-        job.highlighted 
+      className={`bg-white rounded-3xl border transition-all duration-200 overflow-hidden ${
+        isCapped
+          ? "border-slate-300 opacity-90 bg-slate-50/50"
+          : job.highlighted 
           ? "border-amber-300 bg-amber-50/20 shadow-md shadow-amber-500/5 ring-1 ring-amber-300" 
           : job.featured 
           ? "border-rose-200 shadow-md shadow-rose-500/5" 
           : "border-slate-200 hover:border-slate-300 shadow-sm hover:shadow"
       }`}
     >
-      {/* Top Banner if Featured / Almost Full */}
-      {(job.featured || isAlmostFull) && (
+      {/* Top Banner if Featured / Capped / Almost Full */}
+      {isCapped ? (
+        <div className="px-4 sm:px-6 py-1.5 bg-slate-800 text-slate-300 flex items-center justify-between text-[11px] font-bold">
+          <div className="flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>APPLICATION CAP REACHED: 50 / 50 APPLICANTS RECEIVED</span>
+          </div>
+          <span className="text-amber-400">Under Review by Hiring Lead</span>
+        </div>
+      ) : (job.featured || isAlmostFull) && (
         <div className="px-4 sm:px-6 py-1.5 bg-slate-900 text-white flex items-center justify-between text-[11px] font-bold">
           <div className="flex items-center gap-1.5">
             {job.featured && (
@@ -76,7 +109,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
 
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="text-xs font-bold text-slate-500">{job.company}</span>
+              <span className="text-xs font-bold text-slate-600">{job.company}</span>
               <span className="text-slate-300">•</span>
               <span className="inline-flex items-center gap-1 text-xs text-slate-600 font-medium">
                 <MapPin className="w-3 h-3 text-slate-400" />
@@ -84,6 +117,10 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
               </span>
               <span className="text-slate-300">•</span>
               <span className="text-xs text-slate-400 font-mono">{job.postedAt}</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                {job.experienceLevel}
+              </span>
             </div>
 
             <h3 
@@ -113,24 +150,24 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           </div>
         </div>
 
-        {/* Right: 50-Spot Urgency Meter & In-App CTAs */}
+        {/* Right: 50-Spot Urgency Meter & CTAs */}
         <div className="w-full md:w-auto flex flex-row md:flex-col items-center md:items-end justify-between gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
           
           {/* Progress bar */}
           <div className="text-left md:text-right">
             <div className="flex items-center gap-1.5 text-xs font-bold">
-              <span className={isAlmostFull ? "text-rose-600 font-extrabold" : "text-slate-800"}>
+              <span className={isCapped ? "text-slate-500 font-bold" : isAlmostFull ? "text-rose-600 font-extrabold" : "text-slate-800"}>
                 {job.applicantsCount} / {job.maxApplicants} applied
               </span>
               <span className="text-[10px] text-slate-400 font-normal">
-                ({spotsLeft} left)
+                {isCapped ? "(Closed)" : `(${spotsLeft} left)`}
               </span>
             </div>
 
             <div className="w-36 bg-slate-100 h-2 rounded-full overflow-hidden mt-1.5">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${
-                  isAlmostFull ? "bg-rose-500" : "bg-blue-600"
+                  isCapped ? "bg-slate-400" : isAlmostFull ? "bg-rose-500" : "bg-blue-600"
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />
@@ -139,6 +176,33 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2">
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors"
+              title="Share job link"
+            >
+              {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
+            </button>
+
+            {/* Bookmark button */}
+            {onToggleSave && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSave(job.id);
+                }}
+                className={`p-2 rounded-xl border transition-colors ${
+                  isSaved 
+                    ? "bg-rose-50 border-rose-200 text-rose-600" 
+                    : "border-slate-200 text-slate-400 hover:text-rose-500 hover:bg-slate-100"
+                }`}
+                title={isSaved ? "Saved to favorites" : "Bookmark job"}
+              >
+                <Heart className={`w-4 h-4 ${isSaved ? "fill-rose-500" : ""}`} />
+              </button>
+            )}
+
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-1"
@@ -147,14 +211,24 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
 
-            {/* In-App Direct 1-Click Apply */}
-            <button
-              onClick={() => onApplyClick(job)}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>1-Click Apply</span>
-            </button>
+            {/* Apply Button (or Capped state) */}
+            {isCapped ? (
+              <button
+                disabled
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs cursor-not-allowed"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>50/50 Capped</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => onApplyClick(job)}
+                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>1-Click Apply</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -170,6 +244,22 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
               {job.description}
             </p>
           </div>
+
+          {/* Perks & Benefits Pills */}
+          {job.perks && job.perks.length > 0 && (
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                Perks & Benefits
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {job.perks.map((perk, i) => (
+                  <span key={i} className="px-3 py-1 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                    {perk}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {job.responsibilities && job.responsibilities.length > 0 && (
             <div>
@@ -198,7 +288,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
           )}
 
           {/* Hiring manager contact & Direct In-App Apply Bar */}
-          <div className="p-4 rounded-xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-slate-600">
                 <Mail className="w-4 h-4 text-rose-500" />
@@ -207,7 +297,7 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
                 </span>
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">
-                Apply directly through ZeroSpamJobs to be reviewed in 48 hours.
+                Apply directly through ZeroSpamJobs to guarantee your profile is reviewed in 48 hours.
               </div>
             </div>
 
@@ -222,13 +312,22 @@ export default function JobCard({ job, onApplyClick }: JobCardProps) {
                 <ExternalLink className="w-3 h-3" />
               </a>
 
-              <button
-                onClick={() => onApplyClick(job)}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Submit 1-Click Application ({spotsLeft} spots left)</span>
-              </button>
+              {isCapped ? (
+                <button
+                  disabled
+                  className="px-6 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs cursor-not-allowed"
+                >
+                  Application Cap Reached (50/50)
+                </button>
+              ) : (
+                <button
+                  onClick={() => onApplyClick(job)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Submit 1-Click Application ({spotsLeft} spots left)</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -19,7 +19,12 @@ export default function AlertModal({ isOpen, onClose }: AlertModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    // Post to backend API
+    fetch("/api/alerts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, phone, role })
+    }).catch(console.error);
 
     confetti({
       particleCount: 80,

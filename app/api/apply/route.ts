@@ -26,7 +26,8 @@ export async function POST(request: Request) {
       experience: body.experience || "1-3 years",
       pitch: body.pitch || "",
       resumeText: body.resumeText || "",
-      submittedAt: "Just now"
+      submittedAt: "Just now",
+      status: body.status || "submitted"
     };
 
     const saved = addApplication(newApp);

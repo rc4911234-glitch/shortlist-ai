@@ -23,8 +23,7 @@ import {
   AlertCircle,
   Plus
 } from "lucide-react";
-import { Job } from "@/lib/types";
-import { CandidateApplication } from "@/lib/serverStorage";
+import { Job, CandidateApplication } from "@/lib/types";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"candidates" | "jobs" | "payouts">("candidates");
