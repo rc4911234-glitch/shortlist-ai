@@ -30,6 +30,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-slate-400">
+            <Link href="/resume-builder" className="hover:text-white transition-colors">ATS Resume Builder</Link>
             <Link href="/about" className="hover:text-white transition-colors">Manifesto</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
